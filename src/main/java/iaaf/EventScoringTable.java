@@ -1,16 +1,19 @@
-package xyz.maximin.iaaf;
+package iaaf;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Maxim on 12-11-16.
  */
-public class ScoringTable {
+public class EventScoringTable {
     private String mEventName;
     private Set<Integer> mPoints ;
     private Map<Double,Integer> mScorings;
 
-    public ScoringTable(String eventName) {
+    public EventScoringTable(String eventName) {
         mEventName = eventName;
         mPoints = new HashSet<>();
         mScorings = new HashMap<>();
@@ -21,12 +24,12 @@ public class ScoringTable {
 
         // Print warnings if either performance or points were already added before.
         if ( ! pointIsInserted ) {
-            System.out.println( String.format("'%d' points was already added", point) );
+            System.out.println( String.format("WARNING: '%d' points was already added", point) );
             return;
         }
 
         if ( mScorings.containsKey( performance ) ) {
-            System.out.println( String.format("Performance of '%.2f' was already added", performance) );
+            System.out.println( String.format("WARNING: Performance of '%.2f' was already added", performance) );
             return;
         }
 
