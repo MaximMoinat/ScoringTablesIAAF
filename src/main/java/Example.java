@@ -2,10 +2,6 @@
 import iaaf.EventScoringTable;
 import iaaf.ScoringTables;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Scanner;
-
 /**
  * Created by Maxim on 12-11-16.
  */
@@ -27,8 +23,9 @@ public class Example {
 
         System.out.println(master);
 
+        ScoringFileConverter converter = new ScoringFileConverter();
         try {
-            master.read( "IAAF Scoring Tables of Athletics - Indoor.xls" );
+            converter.readFromXls( "IAAF Scoring Tables of Athletics - Indoor.xls" );
         } catch (Exception e) {
             System.out.println( e.getMessage() );
         }
