@@ -5,6 +5,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,7 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Convert IAAF scoring table to simple csv table
+ * Convert IAAF scoring table to simple csv table.
+ * IAAF pdf first needs to be converted to xls. (e.g. with smallpdf.com)
  * TODO:
  *  - Format h:mm:ss.SS. .toString() and returns this as date string ('31-Dec-1899'). Damn you Excel...
  */
@@ -41,11 +43,21 @@ public class ScoringFileConverter {
         mCurrentGender = "?";
     }
 
-    public ScoringTables readFromXls(String filename) throws FileNotFoundException, IOException {
+    public ScoringTables read(String filename) throws IOException, FileFormatException {
+        // Check for extension
+        if ( ! filename.endsWith(".xls") ) {
+            throw new FileFormatException("Only excel .xls is supported. Please convert to xls.");
+        }
+
         // Open file
-        File f = new File("src/main/resources/" + filename);
-        System.out.println( "Opening file: " + f.getAbsoluteFile() );
-        FileInputStream file = new FileInputStream( f );
+        File inFile = new File("src/main/resources/" + filename);
+        System.out.println( "Opening file: " + inFile.getAbsoluteFile() );
+        FileInputStream file = new FileInputStream( inFile );
+
+        // File output (csv)
+        File outFile = new File("src/main/resources/" + filename.split("\\.")[0] + ".csv" );
+        System.out.println( "Writing to: " + outFile.getAbsoluteFile() );
+        mFileWriter = new FileWriter( outFile );
 
         //Get the workbook instance for XLS file
         HSSFWorkbook workbook = new HSSFWorkbook(file);

@@ -4,7 +4,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by Maxim on 12-11-16.
+ * Stores the EventScoringTables for easy retrieval.
+ * Created on 12-11-16.
  */
 public class ScoringTables {
     Map<String,EventScoringTable> mScoringTables;

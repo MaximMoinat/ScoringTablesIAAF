@@ -6,7 +6,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * Created by Maxim on 12-11-16.
+ * Stores Scoring of one event.
+ * Created on 12-11-16.
  */
 public class EventScoringTable {
     private String mEventName;
