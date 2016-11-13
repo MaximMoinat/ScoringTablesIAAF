@@ -34,6 +34,8 @@ public class Example {
 
         System.out.println( fullTable.toString() );
 
+//        System.out.println( ScoringFileConverter.parseTime("1:5.22") );
+
 
     }
 

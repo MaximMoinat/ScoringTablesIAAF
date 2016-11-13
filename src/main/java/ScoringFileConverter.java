@@ -15,7 +15,6 @@ import java.util.List;
  * Convert IAAF scoring table to simple csv table
  * TODO:
  * - Men/Women scheiding => Zelfde onderdeel, zelfde punten weer.
- * - mm:ss conversion
  */
 public class ScoringFileConverter {
     private Row currentRow;
@@ -119,21 +118,21 @@ public class ScoringFileConverter {
             Double performanceDouble;
             Integer pointsInt;
             try {
-                performanceDouble = Double.valueOf( performance );
+                performanceDouble = parseTime( performance );
                 pointsInt = Double.valueOf( pointsResult ).intValue();
             } catch (NumberFormatException e) {
 //                e.printStackTrace();
                 continue;
             }
 
-            // Write processed to file
+            // Write strings to file
             try {
                 mFileWriter.write(String.format("%s,%s,%s\n", colName, performance, pointsResult));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
 
-            // Create lookup table
+            // Create lookup table with processed values
             EventScoringTable eventScoringTable;
             if ( mScoringTables.containsEvent(colName) ) {
                 eventScoringTable = mScoringTables.getEventScoringTable( colName );
@@ -142,6 +141,24 @@ public class ScoringFileConverter {
                 mScoringTables.addScoringTable( eventScoringTable );
             }
             eventScoringTable.addScore( performanceDouble, pointsInt );
+        }
+    }
+
+    public static Double parseTime(String performance) throws NumberFormatException {
+        try {
+            return Double.valueOf( performance );
+        } catch (NumberFormatException nfe) {
+            try {
+                String[] parts = performance.split(":");
+
+                int minutes = Integer.parseInt(parts[0]);
+                Double seconds = Double.parseDouble(parts[1]);
+
+                return minutes*60 + seconds;
+
+            } catch (Exception e) {
+                throw new NumberFormatException( String.format("Can't process '%s'", performance) );
+            }
         }
     }
 
