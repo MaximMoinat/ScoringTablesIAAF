@@ -14,15 +14,15 @@ import java.util.List;
 /**
  * Convert IAAF scoring table to simple csv table
  * TODO:
- * - Men/Women scheiding => Zelfde onderdeel, zelfde punten weer.
+ *  - Format h:mm:ss.SS. .toString() and returns this as date string ('31-Dec-1899'). Damn you Excel...
  */
 public class ScoringFileConverter {
-    private Row currentRow;
     private List<String> currentHeader;
     private int pointsIndex;
 
     private FileWriter mFileWriter;
     private ScoringTables mScoringTables;
+    private String mCurrentGender;
 
     public ScoringFileConverter() {
         this("output.csv");
@@ -38,6 +38,7 @@ public class ScoringFileConverter {
 
         // Object output
         mScoringTables = new ScoringTables();
+        mCurrentGender = "?";
     }
 
     public ScoringTables readFromXls(String filename) throws FileNotFoundException, IOException {
@@ -48,9 +49,11 @@ public class ScoringFileConverter {
 
         //Get the workbook instance for XLS file
         HSSFWorkbook workbook = new HSSFWorkbook(file);
+        int nSheets = workbook.getNumberOfSheets();
 
         //Get first sheet from the workbook
-        for(int i=0; i < workbook.getNumberOfSheets(); i++) {
+        mCurrentGender = "Men";
+        for(int i=0; i < nSheets; i++) {
             // Get next sheet
             HSSFSheet sheet = workbook.getSheetAt(i);
 
@@ -61,6 +64,12 @@ public class ScoringFileConverter {
             } else {
                 pointsIndex = -1;
             }
+
+            // First half is men, second half is women
+            if ( i >= nSheets/2 ) {
+                mCurrentGender = "Women";
+            }
+
             processSheet(sheet);
         }
         mFileWriter.flush();
@@ -69,26 +78,32 @@ public class ScoringFileConverter {
         return mScoringTables;
     }
 
-    public void processSheet(HSSFSheet sheet) {
+    private void processSheet(HSSFSheet sheet) {
 //        System.out.println( String.format( "'%s'", sheet.getSheetName() ) );
         Iterator<Row> rowIterator = sheet.iterator();
 
-        // Header
+        // First row is the header
         currentHeader = rowToArray( rowIterator.next() );
 //        System.out.println(currentHeader);
         if (currentHeader.get(0).contains("\n") ) {
             System.out.printf( "'%s'%n", sheet.getSheetName() );
-            System.out.println("WARNING: this sheets header contains an enter. Does it contain an extra row?");
+            System.out.println(currentHeader);
+            System.out.println("WARNING: the header of this sheet contains an enter. Does it contain an extra row?");
+        } else if (currentHeader.size() <= 2) {
+            System.out.printf( "'%s'%n", sheet.getSheetName() );
+            System.out.println(currentHeader);
+            System.out.println("WARNING: the header of this sheet is too short. Is it correctly formed?");
         }
 
         // Iterate over rows
+        int i = 0;
         while( rowIterator.hasNext() ) {
-            currentRow = rowIterator.next();
-            processRow(currentRow);
+            processRow( rowIterator.next() );
+            i++;
         }
     }
 
-    public void processRow(Row row) {
+    private void processRow(Row row) {
         // Get the row as arrayList
         List<String> rowList = rowToArray(row);
         int n = rowList.size();
@@ -98,7 +113,7 @@ public class ScoringFileConverter {
             return;
         }
 
-        // Points
+        // Points column index (determine for each row separately
         int pointsColumnIndex;
         if ( pointsIndex == 0 ) {
             pointsColumnIndex = 0;
@@ -111,35 +126,39 @@ public class ScoringFileConverter {
             if ( i == pointsColumnIndex ) {
                 continue;
             }
-            String colName = currentHeader.get(i);
+            String eventName = currentHeader.get(i);
             String performance = rowList.get(i);
 
             // If not numeric, continue.
+            // Note: this also silently ignores if the performance is badly formatted
+            // Todo: distinquish between bad and no ('-' or '') input
             Double performanceDouble;
             Integer pointsInt;
             try {
                 performanceDouble = parseTime( performance );
                 pointsInt = Double.valueOf( pointsResult ).intValue();
             } catch (NumberFormatException e) {
-//                e.printStackTrace();
+//                System.out.println( e.getMessage() );
                 continue;
             }
 
             // Write strings to file
             try {
-                mFileWriter.write(String.format("%s,%s,%s\n", colName, performance, pointsResult));
+                mFileWriter.write(String.format("%s,%s,%s,%s\n", eventName, mCurrentGender, performance, pointsResult));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
 
             // Create lookup table with processed values
+            // Note: both event name as gender is key.
             EventScoringTable eventScoringTable;
-            if ( mScoringTables.containsEvent(colName) ) {
-                eventScoringTable = mScoringTables.getEventScoringTable( colName );
+            if ( mScoringTables.containsEvent(eventName, mCurrentGender) ) {
+                eventScoringTable = mScoringTables.getEventScoringTable( eventName, mCurrentGender );
             } else {
-                eventScoringTable = new EventScoringTable( colName );
+                eventScoringTable = new EventScoringTable( eventName, mCurrentGender );
                 mScoringTables.addScoringTable( eventScoringTable );
             }
+
             eventScoringTable.addScore( performanceDouble, pointsInt );
         }
     }
@@ -150,13 +169,21 @@ public class ScoringFileConverter {
         } catch (NumberFormatException nfe) {
             try {
                 String[] parts = performance.split(":");
-
-                int minutes = Integer.parseInt(parts[0]);
-                Double seconds = Double.parseDouble(parts[1]);
-
-                return minutes*60 + seconds;
-
+                if ( parts.length == 2 ) {
+                    int minutes = Integer.parseInt( parts[0] );
+                    Double seconds = Double.parseDouble( parts[1] );
+                    return minutes*60 + seconds;
+                } else if (parts.length == 3) {
+                    int hours = Integer.parseInt( parts[0] );
+                    int minutes = Integer.parseInt( parts[1] );
+                    Double seconds = Double.parseDouble( parts[2] );
+                    return hours*3600 + minutes*60 + seconds;
+                } else {
+                    throw new NumberFormatException();
+                }
             } catch (Exception e) {
+//                System.out.println( e.getMessage() );
+//                e.printStackTrace();
                 throw new NumberFormatException( String.format("Can't process '%s'", performance) );
             }
         }
@@ -167,11 +194,11 @@ public class ScoringFileConverter {
      * @param row
      * @return
      */
-    public List<String> rowToArray(Row row) {
+    private List<String> rowToArray(Row row) {
         Iterator<Cell> cellIterator = row.cellIterator();
         List<String> result = new ArrayList<>();
         while ( cellIterator.hasNext() ) {
-            result.add( cellIterator.next().toString() );
+            result.add( cellIterator.next().toString().trim() );
         }
         return result;
     }

@@ -10,11 +10,13 @@ import java.util.TreeMap;
  */
 public class EventScoringTable {
     private String mEventName;
+    private String mGender;
     private Set<Integer> mPoints ;
     private Map<Double,Integer> mScorings;
 
-    public EventScoringTable(String eventName) {
+    public EventScoringTable(String eventName, String gender) {
         mEventName = eventName;
+        mGender = gender;
         mPoints = new HashSet<>();
         mScorings = new TreeMap<>();
     }
@@ -22,14 +24,14 @@ public class EventScoringTable {
     public void addScore(double performance, int point) {
         boolean pointIsInserted = mPoints.add(point);
 
-        // Print warnings if either performance or points were already added before.
+        // Exit and print warnings if either performance or points were already added before.
         if ( ! pointIsInserted ) {
-            System.out.println( String.format("WARNING: '%d' points was already added", point) );
+            System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, mEventName );
             return;
         }
 
         if ( mScorings.containsKey( performance ) ) {
-            System.out.println( String.format("WARNING: Performance of '%.2f' was already added", performance) );
+            System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, mEventName );
             return;
         }
 
@@ -47,6 +49,10 @@ public class EventScoringTable {
 
     public String getEventName() {
         return mEventName;
+    }
+
+    public String getGender() {
+        return mGender;
     }
 
     @Override

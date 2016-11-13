@@ -9,7 +9,7 @@ import iaaf.ScoringTables;
 public class Example {
 
     public static void main(String[] args) {
-        EventScoringTable table = new EventScoringTable("Honderd meter");
+        EventScoringTable table = new EventScoringTable("Honderd meter", "Mannen");
 
         table.addScore( 6.5, 23);
         table.addScore( 16.5, 34);
@@ -26,13 +26,13 @@ public class Example {
         ScoringFileConverter converter = new ScoringFileConverter();
         ScoringTables fullTable;
         try {
-            fullTable = converter.readFromXls( "IAAF Scoring Tables of Athletics - Indoor.xls" );
+            fullTable = converter.readFromXls( "IAAF Scoring Tables of Athletics - Outdoor.xls" );
         } catch (Exception e) {
             System.out.println( e.getMessage() );
             return;
         }
 
-        System.out.println( fullTable.toString() );
+//        System.out.println( fullTable.toString() );
 
 //        System.out.println( ScoringFileConverter.parseTime("1:5.22") );
 
