@@ -24,11 +24,15 @@ public class Example {
         System.out.println(master);
 
         ScoringFileConverter converter = new ScoringFileConverter();
+        ScoringTables fullTable;
         try {
-            converter.readFromXls( "IAAF Scoring Tables of Athletics - Indoor.xls" );
+            fullTable = converter.readFromXls( "IAAF Scoring Tables of Athletics - Indoor.xls" );
         } catch (Exception e) {
             System.out.println( e.getMessage() );
+            return;
         }
+
+        System.out.println( fullTable.toString() );
 
 
     }

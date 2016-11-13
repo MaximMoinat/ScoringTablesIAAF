@@ -1,12 +1,12 @@
+import iaaf.EventScoringTable;
+import iaaf.ScoringTables;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,20 +14,34 @@ import java.util.List;
 /**
  * Convert IAAF scoring table to simple csv table
  * TODO:
- * - Write to csv
- * - Men/Women scheiding
+ * - Men/Women scheiding => Zelfde onderdeel, zelfde punten weer.
+ * - mm:ss conversion
  */
 public class ScoringFileConverter {
     private Row currentRow;
-    private Cell currentCell;
     private List<String> currentHeader;
     private int pointsIndex;
 
+    private FileWriter mFileWriter;
+    private ScoringTables mScoringTables;
+
     public ScoringFileConverter() {
-        // TODO: filewriter
+        this("output.csv");
     }
 
-    public void readFromXls(String filename) throws FileNotFoundException, IOException {
+    public ScoringFileConverter(String outFile) {
+        // File output
+        try {
+            mFileWriter = new FileWriter(new File(outFile));
+        } catch (IOException ioe ) {
+            ioe.printStackTrace();
+        }
+
+        // Object output
+        mScoringTables = new ScoringTables();
+    }
+
+    public ScoringTables readFromXls(String filename) throws FileNotFoundException, IOException {
         // Open file
         File f = new File("src/main/resources/" + filename);
         System.out.println( "Opening file: " + f.getAbsoluteFile() );
@@ -38,10 +52,8 @@ public class ScoringFileConverter {
 
         //Get first sheet from the workbook
         for(int i=0; i < workbook.getNumberOfSheets(); i++) {
+            // Get next sheet
             HSSFSheet sheet = workbook.getSheetAt(i);
-            if (i==0){
-                continue;
-            }
 
             // Odd sheet (even index), points in first column.
             // Even sheet (odd index), points in last column.
@@ -52,6 +64,10 @@ public class ScoringFileConverter {
             }
             processSheet(sheet);
         }
+        mFileWriter.flush();
+        mFileWriter.close();
+
+        return mScoringTables;
     }
 
     public void processSheet(HSSFSheet sheet) {
@@ -60,8 +76,9 @@ public class ScoringFileConverter {
 
         // Header
         currentHeader = rowToArray( rowIterator.next() );
+//        System.out.println(currentHeader);
         if (currentHeader.get(0).contains("\n") ) {
-            System.out.println( String.format( "'%s'", sheet.getSheetName() ) );
+            System.out.printf( "'%s'%n", sheet.getSheetName() );
             System.out.println("WARNING: this sheets header contains an enter. Does it contain an extra row?");
         }
 
@@ -73,36 +90,58 @@ public class ScoringFileConverter {
     }
 
     public void processRow(Row row) {
+        // Get the row as arrayList
         List<String> rowList = rowToArray(row);
         int n = rowList.size();
 
-        // Points
-        String pointsResult;
-        int skipColIndex;
-        if ( pointsIndex == 0 ) {
-            pointsResult = rowList.get(0);
-            skipColIndex = 0;
-        } else {
-            pointsResult = rowList.get(n - 1);
-            skipColIndex = n-1;
+        // Skip empty rows
+        if ( n <= 1 ) {
+            return;
         }
 
+        // Points
+        int pointsColumnIndex;
+        if ( pointsIndex == 0 ) {
+            pointsColumnIndex = 0;
+        } else {
+            pointsColumnIndex = n-1;
+        }
+        String pointsResult = rowList.get( pointsColumnIndex );
+
         for( int i = 0; i < n; i++ ) {
-            if ( i == skipColIndex ) {
+            if ( i == pointsColumnIndex ) {
                 continue;
             }
             String colName = currentHeader.get(i);
             String performance = rowList.get(i);
 
             // If not numeric, continue.
+            Double performanceDouble;
+            Integer pointsInt;
             try {
-                Double.valueOf(performance);
+                performanceDouble = Double.valueOf( performance );
+                pointsInt = Double.valueOf( pointsResult ).intValue();
             } catch (NumberFormatException e) {
 //                e.printStackTrace();
                 continue;
             }
 
-//            System.out.println(String.format("%s,%s,%s", colName, performance, pointsResult));
+            // Write processed to file
+            try {
+                mFileWriter.write(String.format("%s,%s,%s\n", colName, performance, pointsResult));
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+
+            // Create lookup table
+            EventScoringTable eventScoringTable;
+            if ( mScoringTables.containsEvent(colName) ) {
+                eventScoringTable = mScoringTables.getEventScoringTable( colName );
+            } else {
+                eventScoringTable = new EventScoringTable( colName );
+                mScoringTables.addScoringTable( eventScoringTable );
+            }
+            eventScoringTable.addScore( performanceDouble, pointsInt );
         }
     }
 

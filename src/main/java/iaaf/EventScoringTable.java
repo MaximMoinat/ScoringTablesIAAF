@@ -1,9 +1,9 @@
 package iaaf;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Created by Maxim on 12-11-16.
@@ -16,7 +16,7 @@ public class EventScoringTable {
     public EventScoringTable(String eventName) {
         mEventName = eventName;
         mPoints = new HashSet<>();
-        mScorings = new HashMap<>();
+        mScorings = new TreeMap<>();
     }
 
     public void addScore(double performance, int point) {
