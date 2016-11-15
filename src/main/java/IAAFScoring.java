@@ -1,5 +1,4 @@
 //import model.EventScoringTable;
-import iaaf.EventScoringTable;
 import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
 
@@ -27,7 +26,7 @@ public class IAAFScoring {
         ScoringFileConverter converter = new ScoringFileConverter();
         ScoringTables fullTable;
         try {
-            fullTable = converter.read( "IAAF Scoring Tables of Athletics - Indoor.xls" );
+            fullTable = converter.convert( "IAAF Scoring Tables of Athletics - Indoor.xls" );
         } catch (Exception e) {
             System.out.println( e.getMessage() );
             return;

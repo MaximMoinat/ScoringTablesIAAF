@@ -29,23 +29,20 @@ public class ScoringFileConverter {
     private String mCurrentGender;
 
     public ScoringFileConverter() {
-        this("output.csv");
-    }
-
-    public ScoringFileConverter(String outFile) {
-        // File output
-        try {
-            mFileWriter = new FileWriter(new File(outFile));
-        } catch (IOException ioe ) {
-            ioe.printStackTrace();
-        }
-
         // Object output
         mScoringTables = new ScoringTables();
         mCurrentGender = "?";
     }
 
-    public ScoringTables read(String filename) throws IOException, FileFormatException {
+    /**
+     * Reads the table, parses and writes to a
+     * flat csv file (with the same name as input file)
+     * @param filename
+     * @return
+     * @throws IOException
+     * @throws FileFormatException
+     */
+    public ScoringTables convert(String filename) throws IOException, FileFormatException {
         // Check for extension
         if ( ! filename.endsWith(".xls") ) {
             throw new FileFormatException("Only excel .xls is supported. Please convert to xls.");
