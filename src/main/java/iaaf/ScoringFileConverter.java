@@ -1,3 +1,5 @@
+package iaaf;
+
 import iaaf.EventScoringTable;
 import iaaf.ScoringTables;
 
