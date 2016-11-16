@@ -58,8 +58,9 @@ public class EventScoringTable {
 
     @Override
     public String toString() {
-        return String.format( "%s: %s",
+        return String.format( "%s(%s): %s",
                 getEventName(),
+                getGender(),
                 mScorings.toString()
         );
     }

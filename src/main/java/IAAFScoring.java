@@ -1,11 +1,14 @@
 //import model.EventScoringTable;
+
+import iaaf.EventScoringTable;
 import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
+import java.util.Map;
+import visual.GraphWindow;
 
 /**
  * Created by Maxim on 12-11-16.
  */
-
 public class IAAFScoring {
 
     public static void main(String[] args) {
@@ -26,19 +29,16 @@ public class IAAFScoring {
         ScoringFileConverter converter = new ScoringFileConverter();
         ScoringTables fullTable;
         try {
-            fullTable = converter.convert( "IAAF Scoring Tables of Athletics - Indoor.xls" );
+            fullTable = converter.convert("IAAF Scoring Tables of Athletics - Indoor.xls");
         } catch (Exception e) {
-            System.out.println( e.getMessage() );
+            System.out.println(e.getMessage());
             return;
         }
-
-        System.out.println( fullTable.toString() );
-
+        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
+        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
+        GraphWindow.createAndShowGui(tjMen.getScorings(),tjWomen.getScorings());
+        //System.out.println(tjMen.toString());
 //        System.out.println( iaaf.ScoringFileConverter.parseTime("1:5.22") );
-
-
     }
-
-
 
 }
