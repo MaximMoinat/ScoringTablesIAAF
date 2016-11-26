@@ -1,5 +1,8 @@
 //import model.EventScoringTable;
 
+import functions.ABCFormule;
+import functions.ExtrapolateFunction;
+import functions.IaafFunction;
 import iaaf.EventScoringTable;
 import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
@@ -34,9 +37,13 @@ public class IAAFScoring {
             System.out.println(e.getMessage());
             return;
         }
-        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
+        //EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
+        //tjMen.setFunctie(new ABCFormule());
+        //GraphWindow.createAndShowGui(tjMen.getScorings(),ExtrapolateFunction.Extrapolate(tjMen));
+        
         EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
-        GraphWindow.createAndShowGui(tjMen.getScorings(),tjWomen.getScorings());
+        tjWomen.setFunctie(new ABCFormule());
+        GraphWindow.createAndShowGui(tjWomen.getScorings(),ExtrapolateFunction.Extrapolate(tjWomen));
         //System.out.println(tjMen.toString());
 //        System.out.println( iaaf.ScoringFileConverter.parseTime("1:5.22") );
     }

@@ -35,7 +35,7 @@ public class GraphWindow extends JPanel {
     private static final int GRAPH_POINT_WIDTH = 12;
     private static int yHatchCnt = 15;
     private static int xHatchCnt = 21;
-    private static final int INTERVAL = 50;
+    private static final int INTERVAL = 1;
     private double[][] points;
     private double[][] formula;
     Scanner input = new Scanner(System.in);
@@ -66,14 +66,12 @@ public class GraphWindow extends JPanel {
             }
         }
         //changes maxX to add one reletive to max round number.
-        System.out.printf("%d,\n%d,\n%d,\n%d,\n-----\n",maxX,maxY,xHatchCnt,yHatchCnt);
         maxX+=Math.pow(10,(maxX+"").length()/2);
         maxX=(int)(maxX/Math.pow(10,(maxX+"").length()/2))*(int)Math.pow(10,(maxX+"").length()/2);
         maxY+=Math.pow(10,(maxY+"").length()/2);
         maxY=(int)(maxY/Math.pow(10,(maxY+"").length()/2))*(int)Math.pow(10,(maxY+"").length()/2);
         xHatchCnt=Integer.parseInt((maxX+"").substring(0,2));
         yHatchCnt=Integer.parseInt((maxY+"").substring(0,2));
-        System.out.printf("%d,\n%d,\n%d,\n%d,\n",maxX,maxY,xHatchCnt,yHatchCnt);
     }
 
     @Override
@@ -129,8 +127,8 @@ public class GraphWindow extends JPanel {
 
         g2.setStroke(oldStroke);
         g2.setColor(GRAPH_POINT_COLOR);
-        drawPoints(graphPoints, g2, 0);
-        drawPoints(graphPoints2, g2, -1);
+        //drawPoints(graphPoints, g2, 0);
+        //drawPoints(graphPoints2, g2, -1);
     }
 
     public void drawPoints(List<Point> graphPoints, Graphics2D g2, int dir) {
