@@ -34,9 +34,18 @@ public class ExtrapolateFunction {
     private final String CSV_FILE = "src/main/resources/Formulas.csv";
     private static final String cvsSplitBy = ",";
 
-    public static Map<Double, Integer> Extrapolate(EventScoringTable table) {
+    private static final int DEFAULT_SWEETSPOT_POGINGEN = 6;
+    private static final int DEFAULT_LOCAL_POGINGEN = 100000;
+    private int maxSweetSpotPogingen;
+    private int maxLocalPogingen;
 
-        ExtrapolateFunction extrapolateFunction = new ExtrapolateFunction(table);
+    public static Map<Double, Integer> Extrapolate(EventScoringTable table) {
+        return Extrapolate(table, DEFAULT_SWEETSPOT_POGINGEN, DEFAULT_LOCAL_POGINGEN);
+    }
+
+    public static Map<Double, Integer> Extrapolate(EventScoringTable table, int maxSweetSpotPogingen, int maxLocalPogingen) {
+
+        ExtrapolateFunction extrapolateFunction = new ExtrapolateFunction(table, maxSweetSpotPogingen, maxLocalPogingen);
         extrapolateFunction.findSweetSpot();
 
         return extrapolateFunction.getPoints();
@@ -50,17 +59,21 @@ public class ExtrapolateFunction {
         return formula;
     }
 
-    public ExtrapolateFunction(EventScoringTable table) {
+    public ExtrapolateFunction(EventScoringTable table, int maxSweetSpotPogingen, int maxLocalPogingen) {
+        this.maxSweetSpotPogingen = maxSweetSpotPogingen;
+        this.maxLocalPogingen = maxLocalPogingen;
+
         this.functie = table.getFunctie();
         this.points = table.getScorings();
         this.TableName = table.TableName();
+
         c = points.keySet().toArray(new Double[0])[0];
     }
 
     private void findSweetSpot() {
         LoadSavedValues();
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < maxSweetSpotPogingen; i++) {
             findSweetSpot(i % 3);
         }
         SaveValues();
@@ -123,7 +136,7 @@ public class ExtrapolateFunction {
             }
             Prefafwijking = afwijking;
             afwijking = 0;
-        } while (localPoging < 100000 && lastAantal != points.size());
+        } while (localPoging < maxLocalPogingen && lastAantal != points.size());
         if(bestAantal>lastAantal){
                 a=bestA;
                 b=bestB;

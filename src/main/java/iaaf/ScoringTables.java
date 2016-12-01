@@ -15,7 +15,8 @@ public class ScoringTables {
     }
 
     public void addScoringTable(EventScoringTable table) {
-        String key = getKey( table.getEventName(), table.getGender() );
+        String key = createKey( table.getEventName(), table.getGender() );
+
         if( mScoringTables.containsKey(key) ) {
             System.out.println( key + " already exists" );
             return;
@@ -24,16 +25,16 @@ public class ScoringTables {
         mScoringTables.put( key, table );
     }
 
-    private String getKey( String eventName, String gender ) {
+    private String createKey(String eventName, String gender ) {
         return String.format("%s-%s", eventName, gender);
     }
 
     public EventScoringTable getEventScoringTable( String eventName, String gender ) {
-        return mScoringTables.get( getKey(eventName, gender) );
+        return mScoringTables.get( createKey(eventName, gender) );
     }
 
     public boolean containsEvent( String eventName, String gender ) {
-        return mScoringTables.containsKey( getKey(eventName, gender) );
+        return mScoringTables.containsKey( createKey(eventName, gender) );
     }
 
     @Override
