@@ -1,5 +1,6 @@
 package iaaf;
 
+import functions.Function;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,7 @@ public class EventScoringTable {
     private String mGender;
     private Set<Integer> mPoints ;
     private Map<Double,Integer> mScorings;
+    private Function functie;
 
     public EventScoringTable(String eventName, String gender) {
         mEventName = eventName;
@@ -56,10 +58,26 @@ public class EventScoringTable {
         return mGender;
     }
 
+    public Function getFunctie() {
+        return functie;
+    }
+
+    public void setFunctie(Function functie) {
+        this.functie = functie;
+    }
+    
+    public String TableName(){
+        return String.format( "%s(%s)_%s",
+                getEventName(),
+                getGender(),
+                getFunctie().getClass().getName());
+    }
+    
     @Override
     public String toString() {
-        return String.format( "%s: %s",
+        return String.format( "%s(%s): %s",
                 getEventName(),
+                getGender(),
                 mScorings.toString()
         );
     }
