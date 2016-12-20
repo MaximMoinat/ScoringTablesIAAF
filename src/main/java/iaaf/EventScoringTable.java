@@ -1,10 +1,8 @@
 package iaaf;
 
 import functions.Function;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+
+import java.util.*;
 
 /**
  * Stores Scoring of one event.
@@ -16,6 +14,7 @@ public class EventScoringTable {
     private Set<Integer> mPoints ;
     private Map<Double,Integer> mScorings;
     private Function functie;
+    private int count = 0;
 
     public EventScoringTable(String eventName, String gender) {
         mEventName = eventName;
@@ -40,10 +39,29 @@ public class EventScoringTable {
 
         mScorings.put(performance, point);
 
+        count++;
     }
 
     public Set<Integer> getPoints() {
         return mPoints;
+    }
+
+    public double[] getPointsAsDouble() {
+        double[] result = new double[count];
+        Iterator<Integer> iterator = mPoints.iterator();
+        for (int i = 0;i<count;i++) {
+            result[i] = (double) iterator.next();
+        }
+        return result;
+    }
+
+    public double[] getScoresAsDouble() {
+        double[] result = new double[count];
+        Iterator<Double> iterator = mScorings.keySet().iterator();
+        for (int i = 0;i<count;i++) {
+            result[i] = (double) iterator.next();
+        }
+        return result;
     }
 
     public Map<Double, Integer> getScorings() {
@@ -65,7 +83,11 @@ public class EventScoringTable {
     public void setFunctie(Function functie) {
         this.functie = functie;
     }
-    
+
+    public int getCount() {
+        return count;
+    }
+
     public String TableName(){
         return String.format( "%s(%s)_%s",
                 getEventName(),

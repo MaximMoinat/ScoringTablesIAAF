@@ -3,6 +3,7 @@
 import functions.ABCFormule;
 import functions.ExtrapolateFunction;
 import functions.IaafFunction;
+import functions.PolynomialRegression;
 import iaaf.EventScoringTable;
 import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
@@ -38,14 +39,52 @@ public class IAAFScoring {
             return;
         }
 
+        // Setup
         EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
         tjMen.setFunctie(new ABCFormule());
-        GraphWindow.createAndShowGui( tjMen.getScorings(), ExtrapolateFunction.Extrapolate(tjMen, 1, 100) );
+
+        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
+        tjWomen.setFunctie(new ABCFormule());
+
+        // Threading with runnables
+        Runnable runTjMen = new Runnable(){
+            @Override
+            public void run(){
+                System.out.println("Runnable tjMen running");
+                PolynomialRegression regression = new PolynomialRegression(tjMen.getScoresAsDouble(), tjMen.getPointsAsDouble(), 2);
+                System.out.println(regression);
+                int sum = 0;
+                for( int r: regression.getResidualsCorrected() ) {
+                    sum += Math.abs(r);
+                }
+                System.out.println("Total error is " + sum);
+//                ExtrapolateFunction.Extrapolate(tjMen);
+            }
+        };
+
+        Runnable runTjWomen = new Runnable(){
+            @Override
+            public void run(){
+                System.out.println("Runnable tjWomen running");
+                PolynomialRegression regression = new PolynomialRegression(tjWomen.getScoresAsDouble(), tjWomen.getPointsAsDouble(), 2);
+//                System.out.println(regression);
+//                ExtrapolateFunction.Extrapolate(tjWomen);
+            }
+        };
+
+        Thread thread1 = new Thread(runTjMen);
+        thread1.start();
+        Thread thread2 = new Thread(runTjWomen);
+        thread2.start();
+
+//        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
+//        tjMen.setFunctie(new ABCFormule());
+//        GraphWindow.createAndShowGui( tjMen.getScorings(), ExtrapolateFunction.Extrapolate(tjMen, 1, 100) );
         
 //        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
 //        tjWomen.setFunctie(new ABCFormule());
 //        GraphWindow.createAndShowGui(tjWomen.getScorings(),ExtrapolateFunction.Extrapolate(tjWomen));
-        //System.out.println(tjMen.toString());
+        System.out.println(tjMen.toString());
 //        System.out.println( iaaf.ScoringFileConverter.parseTime("1:5.22") );
     }
 
