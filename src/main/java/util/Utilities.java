@@ -23,6 +23,13 @@ public class Utilities {
         return result;
     }
 
+    /**
+     * Casts a performance to a double if possible
+     * If time format, parses the time.
+     * @param performance
+     * @return
+     * @throws NumberFormatException
+     */
     public static Double parseTime(String performance) throws NumberFormatException {
         try {
             return Double.valueOf( performance );

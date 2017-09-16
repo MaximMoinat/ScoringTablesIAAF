@@ -22,27 +22,33 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
     public void write(String outFilename) throws IOException {
         // File output for each gender
         for (Gender gender : this.keySet1()) {
-            File outFile = new File("src/main/resources/" + outFilename + " - " + gender + ".csv");
-            System.out.println("Writing to: " + outFile.getAbsoluteFile());
-            FileWriter fileWriter = new FileWriter(outFile);
-            fileWriter.write(String.format("%s,%s,%s%n", "event", "performance", "points"));
-
             for (EventScoringTable scoreTable : this.get(gender).values()) {
+                File outFile = new File(String.format("src/main/output/%s - %s - %s.csv",
+                        outFilename,
+                        gender,
+                        scoreTable.getEvent().getIaafName()
+                ));
+                System.out.println("Writing to: " + outFile.getAbsoluteFile());
+                FileWriter fileWriter = new FileWriter(outFile);
+                fileWriter.write(String.format("%s,%s%n", "performance", "points"));
+
                 for (Entry<Double, Integer> score : scoreTable.getScorings().entrySet()) {
-                    fileWriter.write(String.format("%s,%.2f,%d%n",
-                            scoreTable.getEvent().getIaafName(),
+                    fileWriter.write(String.format("%.2f,%d%n",
                             score.getKey(),
                             score.getValue()
                     ));
                 }
+                fileWriter.close();
             }
-            fileWriter.close();
         }
     }
 
     public static void main(String[] args) throws IOException {
-        ScoringTables table = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
-        table.write("Indoor 2017");
+        ScoringTables tableIndoor = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+        tableIndoor.write("Indoor 2017");
+
+        ScoringTables tableOutdoor = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Outdoor 2017.xls");
+        tableOutdoor.write("Outdoor 2017");
     }
 
 }
