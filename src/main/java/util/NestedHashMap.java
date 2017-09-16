@@ -1,6 +1,7 @@
 package util;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeMap;
 
 public abstract class NestedHashMap<K1,K2,V> extends HashMap<K1,TreeMap<K2, V>> {
@@ -18,6 +19,10 @@ public abstract class NestedHashMap<K1,K2,V> extends HashMap<K1,TreeMap<K2, V>> 
 
     public boolean containsKey(K1 key1, K2 key2) {
         return this.containsKey(key1) && this.get(key1).containsKey(key2);
+    }
+
+    public Set<K1> keySet1() {
+        return this.keySet();
     }
 
     @Override

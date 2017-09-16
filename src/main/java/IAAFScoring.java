@@ -1,14 +1,6 @@
 //import model.EventScoringTable;
 
-import functions.ABCFormule;
-import functions.ExtrapolateFunction;
-import functions.IaafFunction;
-import functions.PolynomialRegression;
-import iaaf.EventScoringTable;
-import iaaf.ScoringFileConverter;
 import iaaf.ScoringTables;
-import java.util.Map;
-import visual.GraphWindow;
 
 /**
  * Created by Maxim on 12-11-16.
@@ -30,19 +22,19 @@ public class IAAFScoring {
 //
 //        System.out.println(master);
 
-        ScoringFileConverter converter = new ScoringFileConverter();
+//        ScoringFileConverter converter = new ScoringFileConverter();
         ScoringTables indoor2014, outdoor2014, indoor2017, outdoor2017;
         try {
 //            indoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2014.xls");
 //            outdoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Outdoor 2014.xls");
 //            indoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
-            outdoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+//            outdoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
 //        indoor2017.keySet().stream().sorted().forEach(System.out::println);
-        System.out.println(outdoor2017.toString());
+//        System.out.println(outdoor2017.toString());
 
 //
 //        // Setup
