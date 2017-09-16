@@ -32,7 +32,7 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
                 FileWriter fileWriter = new FileWriter(outFile);
                 fileWriter.write(String.format("%s,%s%n", "performance", "points"));
 
-                for (Entry<Double, Integer> score : scoreTable.getScorings().entrySet()) {
+                for (Entry<Double, Integer> score : scoreTable.getPerformancePoints().entrySet()) {
                     fileWriter.write(String.format("%.2f,%d%n",
                             score.getKey(),
                             score.getValue()
@@ -44,10 +44,10 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
     }
 
     public static void main(String[] args) throws IOException {
-        ScoringTables tableIndoor = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+        ScoringTables tableIndoor = ScoringTablesBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
         tableIndoor.write("Indoor 2017");
 
-        ScoringTables tableOutdoor = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Outdoor 2017.xls");
+        ScoringTables tableOutdoor = ScoringTablesBuilder.readFromXls("IAAF Scoring Tables of Athletics - Outdoor 2017.xls");
         tableOutdoor.write("Outdoor 2017");
     }
 

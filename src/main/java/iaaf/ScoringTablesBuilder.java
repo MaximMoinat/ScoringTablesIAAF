@@ -12,8 +12,8 @@ import java.util.List;
 import static util.Utilities.parseTime;
 import static util.Utilities.rowToArray;
 
-public class ScoringTableBuilder {
-    private static final Logger logger = Logger.getLogger(ScoringTableBuilder.class.getName());
+public class ScoringTablesBuilder {
+    private static final Logger logger = Logger.getLogger(ScoringTablesBuilder.class.getName());
 
     private HSSFWorkbook workbook;
     private ScoringTables scoringTables;
@@ -33,11 +33,11 @@ public class ScoringTableBuilder {
             throw new IOException("Only excel .xls is supported. Please convert to xls.");
         }
 
-        ScoringTableBuilder builder = new ScoringTableBuilder(filename);
+        ScoringTablesBuilder builder = new ScoringTablesBuilder(filename);
         return builder.build();
     }
 
-    private ScoringTableBuilder(String filename) throws IOException {
+    private ScoringTablesBuilder(String filename) throws IOException {
         // Create scoring tables instance
         scoringTables = new ScoringTables();
 
@@ -146,7 +146,7 @@ public class ScoringTableBuilder {
     }
 
     public static void main(String[] args) throws IOException {
-        ScoringTables table = ScoringTableBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+        ScoringTables table = ScoringTablesBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
         System.out.println(table.toString());
     }
 }

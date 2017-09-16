@@ -1,6 +1,8 @@
 package iaaf;
 
 import functions.Function;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.TreeBidiMap;
 
 import java.util.*;
 
@@ -10,16 +12,13 @@ import java.util.*;
 public class EventScoringTable {
     private Gender gender;
     private Event event;
-    private Set<Integer> mPoints ;
-    private Map<Double,Integer> mScorings;
+    private BidiMap<Double,Integer> performancePoints;
     private Function functie;
-    private int count = 0;
 
     public EventScoringTable(Gender gender, Event event) {
         this.gender = gender;
         this.event = event;
-        mPoints = new HashSet<>();
-        mScorings = new TreeMap<>();
+        performancePoints = new TreeBidiMap<>();
     }
 
     public EventScoringTable(String genderName, String eventName) {
@@ -27,48 +26,35 @@ public class EventScoringTable {
     }
 
     public void addScore(double performance, int point) {
-        boolean pointIsInserted = mPoints.add(point);
-
         // Exit and print warnings if either performance or points were already added before.
-        if ( ! pointIsInserted ) {
+        if ( performancePoints.containsValue(point) ) {
             System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, event);
             return;
         }
 
-        if ( mScorings.containsKey( performance ) ) {
+        if ( performancePoints.containsKey(performance) ) {
             System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, event);
             return;
         }
-
-        mScorings.put(performance, point);
-
-        count++;
-    }
-
-    public Set<Integer> getPoints() {
-        return mPoints;
+        performancePoints.put(performance, point);
     }
 
     public double[] getPointsAsDouble() {
-        double[] result = new double[count];
-        Iterator<Integer> iterator = mPoints.iterator();
-        for (int i = 0;i<count;i++) {
-            result[i] = (double) iterator.next();
-        }
-        return result;
+        return performancePoints
+                .values()
+                .stream()
+                .mapToDouble(Integer::doubleValue)
+                .toArray();
     }
 
-    public double[] getScoresAsDouble() {
-        double[] result = new double[count];
-        Iterator<Double> iterator = mScorings.keySet().iterator();
-        for (int i = 0;i<count;i++) {
-            result[i] = (double) iterator.next();
-        }
-        return result;
+    public Double[] getScoresAsDouble() {
+        return performancePoints
+                .keySet()
+                .toArray(new Double[this.getCount()]);
     }
 
-    public Map<Double, Integer> getScorings() {
-        return mScorings;
+    public Map<Double, Integer> getPerformancePoints() {
+        return performancePoints;
     }
 
     public Event getEvent() {
@@ -88,7 +74,7 @@ public class EventScoringTable {
     }
 
     public int getCount() {
-        return count;
+        return performancePoints.size();
     }
 
     public String TableName(){
@@ -103,7 +89,7 @@ public class EventScoringTable {
         return String.format( "%s(%s): %s",
                 getEvent(),
                 getGender(),
-                mScorings.toString()
+                performancePoints.toString()
         );
     }
 }

@@ -7,16 +7,11 @@ package functions;
 
 import iaaf.EventScoringTable;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -64,7 +59,7 @@ public class ExtrapolateFunction {
         this.maxLocalPogingen = maxLocalPogingen;
 
         this.functie = table.getFunctie();
-        this.points = table.getScorings();
+        this.points = table.getPerformancePoints();
         this.TableName = table.TableName();
 
         c = points.keySet().toArray(new Double[0])[0];
