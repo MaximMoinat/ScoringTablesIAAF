@@ -31,61 +31,73 @@ public class IAAFScoring {
 //        System.out.println(master);
 
         ScoringFileConverter converter = new ScoringFileConverter();
-        ScoringTables fullTable;
+        ScoringTables indoor2014, outdoor2014, indoor2017, outdoor2017;
         try {
-            fullTable = converter.convert("IAAF Scoring Tables of Athletics - Indoor.xls");
+//            indoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2014.xls");
+//            outdoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Outdoor 2014.xls");
+//            indoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+            outdoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;
         }
+//        indoor2017.keySet().stream().sorted().forEach(System.out::println);
+        System.out.println(outdoor2017.toString());
 
-        // Setup
-        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
-        tjMen.setFunctie(new ABCFormule());
-
-        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
-        tjWomen.setFunctie(new ABCFormule());
-
-        // Threading with runnables
-        Runnable runTjMen = new Runnable(){
-            @Override
-            public void run(){
-                System.out.println("Runnable tjMen running");
-                PolynomialRegression regression = new PolynomialRegression(tjMen.getScoresAsDouble(), tjMen.getPointsAsDouble(), 2);
-                System.out.println(regression);
-                int sum = 0;
-                for( int r: regression.getResidualsCorrected() ) {
-                    sum += Math.abs(r);
-                }
-                System.out.println("Total error is " + sum);
-//                ExtrapolateFunction.Extrapolate(tjMen);
-            }
-        };
-
-        Runnable runTjWomen = new Runnable(){
-            @Override
-            public void run(){
-                System.out.println("Runnable tjWomen running");
-                PolynomialRegression regression = new PolynomialRegression(tjWomen.getScoresAsDouble(), tjWomen.getPointsAsDouble(), 2);
-//                System.out.println(regression);
-//                ExtrapolateFunction.Extrapolate(tjWomen);
-            }
-        };
-
-        Thread thread1 = new Thread(runTjMen);
-        thread1.start();
-        Thread thread2 = new Thread(runTjWomen);
-        thread2.start();
-
+//
+//        // Setup
 //        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
 //        tjMen.setFunctie(new ABCFormule());
-//        GraphWindow.createAndShowGui( tjMen.getScorings(), ExtrapolateFunction.Extrapolate(tjMen, 1, 100) );
-        
+//
 //        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
 //        tjWomen.setFunctie(new ABCFormule());
-//        GraphWindow.createAndShowGui(tjWomen.getScorings(),ExtrapolateFunction.Extrapolate(tjWomen));
-        System.out.println(tjMen.toString());
+//
+//        // Threading with runnables
+//        Runnable runTjMen = new Runnable(){
+//            @Override
+//            public void run(){
+//                System.out.println("Runnable tjMen running");
+//                PolynomialRegression regression = new PolynomialRegression(tjMen.getScoresAsDouble(), tjMen.getPointsAsDouble(), 2);
+//                System.out.println(regression);
+//                int sum = 0;
+//                for( int r: regression.getResidualsCorrected() ) {
+//                    sum += Math.abs(r);
+//                }
+//                System.out.println("Total error is " + sum);
+////                ExtrapolateFunction.Extrapolate(tjMen);
+//            }
+//        };
+//
+//        Runnable runTjWomen = new Runnable(){
+//            @Override
+//            public void run(){
+//                System.out.println("Runnable tjWomen running");
+//                PolynomialRegression regression = new PolynomialRegression(tjWomen.getScoresAsDouble(), tjWomen.getPointsAsDouble(), 2);
+////                System.out.println(regression);
+////                ExtrapolateFunction.Extrapolate(tjWomen);
+//            }
+//        };
+//
+//        Thread thread1 = new Thread(runTjMen);
+//        thread1.start();
+//        Thread thread2 = new Thread(runTjWomen);
+//        thread2.start();
+//
+////        EventScoringTable tjMen = fullTable.getEventScoringTable("TJ", "Men");
+////        tjMen.setFunctie(new ABCFormule());
+////        GraphWindow.createAndShowGui( tjMen.getScorings(), ExtrapolateFunction.Extrapolate(tjMen, 1, 100) );
+//
+////        EventScoringTable tjWomen = fullTable.getEventScoringTable("TJ", "Women");
+////        tjWomen.setFunctie(new ABCFormule());
+////        GraphWindow.createAndShowGui(tjWomen.getScorings(),ExtrapolateFunction.Extrapolate(tjWomen));
+//        System.out.println(tjMen.toString());
 //        System.out.println( iaaf.ScoringFileConverter.parseTime("1:5.22") );
     }
+
+//    public ScoringTables scoresToCsv(String filename) {
+//        ScoringFileConverter converter = new ScoringFileConverter(filename);
+//        converter.load();
+//        converter.write();
+//    }
 
 }

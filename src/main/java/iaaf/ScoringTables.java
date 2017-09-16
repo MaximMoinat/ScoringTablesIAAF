@@ -1,49 +1,26 @@
 package iaaf;
 
-import java.util.Map;
-import java.util.TreeMap;
+import util.NestedHashMap;
 
 /**
- * Stores the EventScoringTables for easy retrieval.
  * Created on 12-11-16.
  */
-public class ScoringTables {
-    Map<String,EventScoringTable> mScoringTables;
-
-    public ScoringTables() {
-        mScoringTables = new TreeMap<>();
-    }
+public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable> {
 
     public void addScoringTable(EventScoringTable table) {
-        String key = createKey( table.getEventName(), table.getGender() );
+        Event event = table.getEvent();
+        Gender gender = table.getGender();
 
-        if( mScoringTables.containsKey(key) ) {
-            System.out.println( key + " already exists" );
+        if( this.containsKey(gender, event) ) {
+            System.out.println(String.format("%s-%s already exists", gender, event ));
             return;
         }
 
-        mScoringTables.put( key, table );
+        this.put(gender, event, table);
     }
 
-    private String createKey(String eventName, String gender ) {
-        return String.format("%s-%s", eventName, gender);
-    }
+    public void write(String outFilename) {
 
-    public EventScoringTable getEventScoringTable( String eventName, String gender ) {
-        return mScoringTables.get( createKey(eventName, gender) );
-    }
-
-    public boolean containsEvent( String eventName, String gender ) {
-        return mScoringTables.containsKey( createKey(eventName, gender) );
-    }
-
-    @Override
-    public String toString() {
-        String result = "";
-        for( EventScoringTable value : mScoringTables.values() ) {
-            result += value.toString() + "\n";
-        }
-        return result;
     }
 
 }

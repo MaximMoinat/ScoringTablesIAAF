@@ -5,7 +5,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.List;
 
 /**
  * Convert IAAF scoring table to simple csv table.
- * IAAF pdf first needs to be converted to xls. (e.g. with smallpdf.com)
+ * Input file needs to be .xls
  * TODO:
  *  - Format h:mm:ss.SS. .toString() and returns this as date string ('31-Dec-1899'). Damn you Excel...
  */
@@ -24,12 +23,12 @@ public class ScoringFileConverter {
 
     private FileWriter mFileWriter;
     private ScoringTables mScoringTables;
-    private String mCurrentGender;
+    private Gender currentGender;
 
     public ScoringFileConverter() {
         // Object output
         mScoringTables = new ScoringTables();
-        mCurrentGender = "?";
+        currentGender = Gender.UNKNOWN;
     }
 
     /**
@@ -38,12 +37,11 @@ public class ScoringFileConverter {
      * @param filename
      * @return
      * @throws IOException
-     * @throws FileFormatException
      */
-    public ScoringTables convert(String filename) throws IOException, FileFormatException {
+    public ScoringTables convert(String filename) throws IOException {
         // Check for extension
         if ( ! filename.endsWith(".xls") ) {
-            throw new FileFormatException("Only excel .xls is supported. Please convert to xls.");
+            throw new IOException("Only excel .xls is supported. Please convert to xls.");
         }
 
         // Open file
@@ -55,13 +53,14 @@ public class ScoringFileConverter {
         File outFile = new File("src/main/resources/" + filename.split("\\.")[0] + ".csv" );
         System.out.println( "Writing to: " + outFile.getAbsoluteFile() );
         mFileWriter = new FileWriter( outFile );
+        mFileWriter.write(String.format("%s,%s,%s,%s\n", "event", "gender", "performance", "points"));
 
         //Get the workbook instance for XLS file
         HSSFWorkbook workbook = new HSSFWorkbook(file);
         int nSheets = workbook.getNumberOfSheets();
 
         //Get first sheet from the workbook
-        mCurrentGender = "Men";
+        currentGender = Gender.MALE;
         for(int i=0; i < nSheets; i++) {
             // Get next sheet
             HSSFSheet sheet = workbook.getSheetAt(i);
@@ -76,7 +75,7 @@ public class ScoringFileConverter {
 
             // First half is men, second half is women
             if ( i >= nSheets/2 ) {
-                mCurrentGender = "Women";
+                currentGender = Gender.FEMALE;
             }
 
             processSheet(sheet);
@@ -94,7 +93,7 @@ public class ScoringFileConverter {
         // First row is the header
         currentHeader = rowToArray( rowIterator.next() );
 //        System.out.println(currentHeader);
-        if (currentHeader.get(0).contains("\n") ) {
+        if (currentHeader.stream().anyMatch(x -> x.contains("\n"))) {
             System.out.printf( "'%s'%n", sheet.getSheetName() );
             System.out.println(currentHeader);
             System.out.println("WARNING: the header of this sheet contains an enter. Does it contain an extra row?");
@@ -103,7 +102,6 @@ public class ScoringFileConverter {
             System.out.println(currentHeader);
             System.out.println("WARNING: the header of this sheet is too short. Is it correctly formed?");
         }
-
         // Iterate over rows
         int i = 0;
         while( rowIterator.hasNext() ) {
@@ -135,14 +133,13 @@ public class ScoringFileConverter {
             if ( i == pointsColumnIndex ) {
                 continue;
             }
-            String eventName = currentHeader.get(i);
-            String performance = rowList.get(i);
 
             // If not numeric, continue.
             // Note: this also silently ignores if the performance is badly formatted
-            // Todo: distinquish between bad and no ('-' or '') input
+            // Todo: distinguish between bad and no ('-' or '') input
             Double performanceDouble;
             Integer pointsInt;
+            String performance = rowList.get(i);
             try {
                 performanceDouble = parseTime( performance );
                 pointsInt = Double.valueOf( pointsResult ).intValue();
@@ -151,24 +148,27 @@ public class ScoringFileConverter {
                 continue;
             }
 
+            // Parse event
+            String eventName = currentHeader.get(i);
+            Event event = Event.fromString(eventName);
+
             // Write strings to file
             try {
-                mFileWriter.write(String.format("%s,%s,%s,%s\n", eventName, mCurrentGender, performance, pointsResult));
+                mFileWriter.write(String.format("%s,%s,%s,%s\n", eventName, currentGender, performance, pointsResult));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
 
             // Create lookup table with processed values
-            // Note: both event name as gender is key.
             EventScoringTable eventScoringTable;
-            if ( mScoringTables.containsEvent(eventName, mCurrentGender) ) {
-                eventScoringTable = mScoringTables.getEventScoringTable( eventName, mCurrentGender );
+            if (mScoringTables.containsKey(currentGender, event)) {
+                eventScoringTable = mScoringTables.get(currentGender, event);
             } else {
-                eventScoringTable = new EventScoringTable( eventName, mCurrentGender );
-                mScoringTables.addScoringTable( eventScoringTable );
+                eventScoringTable = new EventScoringTable(currentGender, event);
+                mScoringTables.addScoringTable(eventScoringTable);
             }
-
             eventScoringTable.addScore( performanceDouble, pointsInt );
+
         }
     }
 

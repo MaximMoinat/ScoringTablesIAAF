@@ -5,22 +5,25 @@ import functions.Function;
 import java.util.*;
 
 /**
- * Stores Scoring of one event.
  * Created on 12-11-16.
  */
 public class EventScoringTable {
-    private String mEventName;
-    private String mGender;
+    private Gender gender;
+    private Event event;
     private Set<Integer> mPoints ;
     private Map<Double,Integer> mScorings;
     private Function functie;
     private int count = 0;
 
-    public EventScoringTable(String eventName, String gender) {
-        mEventName = eventName;
-        mGender = gender;
+    public EventScoringTable(Gender gender, Event event) {
+        this.gender = gender;
+        this.event = event;
         mPoints = new HashSet<>();
         mScorings = new TreeMap<>();
+    }
+
+    public EventScoringTable(String genderName, String eventName) {
+        this(Gender.fromString(genderName), Event.fromString(eventName));
     }
 
     public void addScore(double performance, int point) {
@@ -28,12 +31,12 @@ public class EventScoringTable {
 
         // Exit and print warnings if either performance or points were already added before.
         if ( ! pointIsInserted ) {
-            System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, mEventName );
+            System.out.printf( "WARNING: '%d' points was already added to '%s'.%n", point, event);
             return;
         }
 
         if ( mScorings.containsKey( performance ) ) {
-            System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, mEventName );
+            System.out.printf( "WARNING: Performance of '%.2f' was already added to '%s'.%n", performance, event);
             return;
         }
 
@@ -68,12 +71,12 @@ public class EventScoringTable {
         return mScorings;
     }
 
-    public String getEventName() {
-        return mEventName;
+    public Event getEvent() {
+        return event;
     }
 
-    public String getGender() {
-        return mGender;
+    public Gender getGender() {
+        return gender;
     }
 
     public Function getFunctie() {
@@ -90,7 +93,7 @@ public class EventScoringTable {
 
     public String TableName(){
         return String.format( "%s(%s)_%s",
-                getEventName(),
+                getEvent(),
                 getGender(),
                 getFunctie().getClass().getName());
     }
@@ -98,7 +101,7 @@ public class EventScoringTable {
     @Override
     public String toString() {
         return String.format( "%s(%s): %s",
-                getEventName(),
+                getEvent(),
                 getGender(),
                 mScorings.toString()
         );
