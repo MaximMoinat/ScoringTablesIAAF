@@ -130,7 +130,7 @@ public class ScoringTablesBuilder {
             try {
                 performance = parseTime(performanceRaw);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 continue;
             }
 

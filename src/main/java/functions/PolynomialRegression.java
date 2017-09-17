@@ -130,7 +130,8 @@ public class PolynomialRegression {
      */
     public double beta(int j) {
         // to make -0.0 print as 0.0
-        if (Math.abs(beta.get(j, 0)) < 1E-4) return 0.0;
+        // MM: do not ignore small beta values
+//        if (Math.abs(beta.get(j, 0)) < 1E-4) return 0.0;
         return beta.get(j, 0);
     }
 
@@ -225,9 +226,9 @@ public class PolynomialRegression {
      */
     public static void main(String[] args) {
         double[] x = { 10, 20, 40, 80, 160, 200 };
-        double[] y = { 100, 350, 1500, 6700, 20160, 40000 };
+        double[] y = { 100, 400, 1600, 6400, 25600, 40000 };
 
-        PolynomialRegression regression = new PolynomialRegression(x, y, 3);
+        PolynomialRegression regression = new PolynomialRegression(x, y, 2);
         System.out.println(regression);
     }
 }
