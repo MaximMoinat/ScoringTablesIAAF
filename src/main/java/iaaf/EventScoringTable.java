@@ -1,6 +1,7 @@
 package iaaf;
 
 import functions.Function;
+import functions.IaafFunction;
 import functions.PolynomialRegression;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
@@ -19,7 +20,7 @@ public class EventScoringTable {
     private Event event;
     private BidiMap<Double,Integer> performancePoints;
     private Function functie;
-    private PolynomialRegression regression;
+    private IaafFunction scoringFunction;
 
     public EventScoringTable(Gender gender, Event event) {
         this.gender = gender;
@@ -53,7 +54,13 @@ public class EventScoringTable {
      * // TODO: tests
      */
     public Integer lookupPoints(double performance) {
-        int i = 0;
+        performance = Math.round(performance * 100d)/100d;
+
+        if (performance < Collections.min(performancePoints.keySet())
+                || performance> Collections.max(performancePoints.keySet())) {
+            throw new IllegalArgumentException("Performance out of bounds");
+        }
+
         while (true) {
             if (this.performancePoints.containsKey(performance)) {
                 return this.performancePoints.get(performance);
@@ -74,13 +81,6 @@ public class EventScoringTable {
                     performance = Math.round(performance);
                     break;
             }
-
-            // If nothing found after 10 cycles, abort
-            if (i > 10) {
-                logger.warning("Could not find points for the given performance");
-                return null;
-            }
-            i++;
         }
     }
 
@@ -92,6 +92,11 @@ public class EventScoringTable {
      * // TODO: tests
      */
     public Double lookupPerformance(int points) {
+        if (points < Collections.min(performancePoints.values())
+                || points> Collections.max(performancePoints.values())) {
+            throw new IllegalArgumentException("Points out of bounds");
+        }
+
         int i = 0;
         while (true) {
             if (this.performancePoints.containsValue(points)) {
@@ -137,12 +142,8 @@ public class EventScoringTable {
         return gender;
     }
 
-    public Function getFunctie() {
-        return functie;
-    }
-
-    public void setFunctie(Function functie) {
-        this.functie = functie;
+    public Function getFunction() {
+        return scoringFunction;
     }
 
     public int getCount() {
@@ -151,69 +152,29 @@ public class EventScoringTable {
 
     public void doRegression() {
         System.out.println("Starting Polynomial Regression for: " + gender + event);
-        regression = new PolynomialRegression(this.getScoresAsDouble(), this.getPointsAsDouble(), 2);
+        PolynomialRegression regression = new PolynomialRegression(this.getScoresAsDouble(), this.getPointsAsDouble(), 2);
+        this.scoringFunction = new IaafFunction(regression.beta(2),regression.beta(1),regression.beta(0));
     }
 
-    public void printRegression() {
-        if (regression == null) {
-            this.doRegression();
+    public int calculatePoints(double performance) {
+        if (this.scoringFunction == null) {
+            throw new IllegalArgumentException("Please execute regression first with .doRegression()");
         }
+        return (int) Math.round(this.scoringFunction.calculatePoints(performance));
+    }
 
-        BigDecimal a = new BigDecimal(regression.beta(2));
-        BigDecimal b = new BigDecimal(regression.beta(1));
-        BigDecimal c = new BigDecimal(regression.beta(0));
-
-        if (a.equals(BigDecimal.ZERO)) {
-            // simple bx + c
-            System.out.println(String.format("%-15s- %6s: %9.6f x %s %12.6f",
-                    event,
-                    gender,
-                    b,
-                    c.compareTo(BigDecimal.ZERO) > 0 ? '+' : '-',
-                    c.abs()
-            ));
-            return;
-        };
-
-        BigDecimal two  = new BigDecimal(2);
-        BigDecimal four = new BigDecimal(4);
-
-        // Reformatting to get constants from ax^2 + bx + c to ai(bi-x)^2 + ci
-        BigDecimal ai = a;
-        // bi = b/2a
-        BigDecimal bi = b.divide(a.multiply(two),BigDecimal.ROUND_HALF_EVEN).negate();
-        // c = c - b^2/4a
-        BigDecimal ci = c.subtract(b.pow(2).divide((a.multiply(four)),BigDecimal.ROUND_HALF_EVEN));
-
-
-        if (this.event.getPerformanceType().equals(PerformanceType.TIME)) {
-            System.out.println(String.format("%-15s- %6s: %9.6f (%12.6f - t)^2 %s %12.6f",
-                    event,
-                    gender,
-                    ai,
-                    bi,
-                    ci.compareTo(BigDecimal.ZERO) > 0 ? '+' : '-',
-                    ci.abs()
-            ));
-        } else {
-            System.out.println(String.format("%-15s- %6s: %9.6f (x %s %12.6f)^2 %s %12.6f",
-                    event,
-                    gender,
-                    ai,
-                    bi.compareTo(BigDecimal.ZERO) > 0 ? '-' : '+',
-                    bi.abs(),
-                    ci.compareTo(BigDecimal.ZERO) > 0 ? '+' : '-',
-                    ci.abs()
-            ));
+    public double calculatePerformance(int points) {
+        if (this.scoringFunction == null) {
+            throw new IllegalArgumentException("Please execute regression first with .doRegression()");
         }
-
+        return this.scoringFunction.calculatePerformance(points);
     }
 
     public String TableName(){
         return String.format( "%s(%s)_%s",
                 getEvent(),
                 getGender(),
-                getFunctie().getClass().getName());
+                getFunction().getClass().getName());
     }
     
     @Override

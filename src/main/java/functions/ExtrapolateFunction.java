@@ -58,7 +58,7 @@ public class ExtrapolateFunction {
         this.maxSweetSpotPogingen = maxSweetSpotPogingen;
         this.maxLocalPogingen = maxLocalPogingen;
 
-        this.functie = table.getFunctie();
+        this.functie = table.getFunction();
         this.points = table.getPerformancePoints();
         this.TableName = table.TableName();
 
