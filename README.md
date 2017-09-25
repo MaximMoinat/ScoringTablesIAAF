@@ -7,6 +7,7 @@ After building, the script can be executed with:
 ```bash
 java IaafScoring src/main/resources/
 ```
+Output will be written to [`src/main/resources/formula_constants`](/src/main/resources/formula_constants) and [`src/main/resources/scoring_tables`](/src/main/resources/scoring_tables)
 
 The original .pdf tables can be found on [the IAAF website](https://www.iaaf.org/about-iaaf/documents/technical)<sup>1</sup>. 
 This scoring system can be used to compare different track and field events, and are also referred to as 'Hungarian Points'. Currently the script has only been used for the 2014 Revised Edition (2014-04-07), for both outdoor and indoor.
