@@ -6,6 +6,7 @@ import functions.PolynomialRegression;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.TreeBidiMap;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -142,7 +143,7 @@ public class EventScoringTable {
         return gender;
     }
 
-    public Function getFunction() {
+    public IaafFunction getFunction() {
         return scoringFunction;
     }
 
@@ -151,7 +152,7 @@ public class EventScoringTable {
     }
 
     public void doRegression() {
-        System.out.println("Starting Polynomial Regression for: " + gender + event);
+//        System.out.println("Starting Polynomial Regression for: " + gender + event);
         PolynomialRegression regression = new PolynomialRegression(this.getScoresAsDouble(), this.getPointsAsDouble(), 2);
         this.scoringFunction = new IaafFunction(regression.beta(2),regression.beta(1),regression.beta(0));
     }
@@ -176,6 +177,10 @@ public class EventScoringTable {
                 getGender(),
                 getFunction().getClass().getName());
     }
+
+    public String functionToString() {
+        return this.scoringFunction.toString(event.getPerformanceType());
+    }
     
     @Override
     public String toString() {
@@ -187,15 +192,12 @@ public class EventScoringTable {
     }
 
     public static void main(String[] args) throws IOException{
-        ScoringTables tableIndoor = ScoringTablesBuilder.readFromXls("IAAF Scoring Tables of Athletics - Outdoor 2017.xls");
-//        tableIndoor.get(Gender.MALE, Event.TRACK_100).printRegression();
-//        tableIndoor.get(Gender.MALE, Event.DISCUS_THROW).printRegression();
-//        tableIndoor.get(Gender.MALE, Event.DECATHLON).printRegression();
-//        tableIndoor.get(Gender.FEMALE, Event.HEPTATHLON).printRegression();
-//        tableIndoor.get(Gender.MALE, Event.TRACK_200).printRegression();
-//        System.out.println(tableIndoor.get(Gender.MALE, Event.TRACK_200).regression.predict(19.19));
-        System.out.println(tableIndoor.get(Gender.FEMALE, Event.HEPTATHLON).lookupPoints(7000));
-        System.out.println(tableIndoor.get(Gender.FEMALE, Event.HEPTATHLON).lookupPerformance(1272));
-        System.out.println(tableIndoor.get(Gender.FEMALE, Event.LONG_JUMP).lookupPerformance(1297));
+        ScoringTables tables = ScoringTablesBuilder.readFromXls(new File("/src/main/resources/IAAF Scoring Tables of Athletics - Outdoor 2014.xls"));
+        EventScoringTable tripleJumpScores = tables.get(Gender.MALE, Event.TRIPLE_JUMP);
+        tripleJumpScores.doRegression();
+        System.out.println(tripleJumpScores.functionToString());
+        System.out.println(tripleJumpScores.getFunction().getA());
+        System.out.println(tripleJumpScores.getFunction().getB());
+        System.out.println(tripleJumpScores.getFunction().getC());
     }
 }

@@ -1,38 +1,53 @@
 //import model.EventScoringTable;
 
 import iaaf.ScoringTables;
+import iaaf.ScoringTablesBuilder;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Maxim on 12-11-16.
  */
 public class IAAFScoring {
 
-    public static void main(String[] args) {
-//        EventScoringTable table = new EventScoringTable("Honderd meter", "Mannen");
-//
-//        table.addScore( 6.5, 23);
-//        table.addScore( 16.5, 34);
-//        table.addScore( 26.5, 40);
-//        table.addScore( 33, 40);
-//        table.addScore( 26.5, 55);
-//
-//        ScoringTables master = new ScoringTables();
-//
-//        master.addScoringTable( table );
-//
-//        System.out.println(master);
+    /**
+     * Read IAAF points tables
+     * @param args Path to folder where IAAF points tables as .xls can be found
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+        File path = new File(args[0]);
+
+        for (File inFile : path.listFiles((dir, name) -> name.endsWith(".xls"))) {
+            System.out.println("Processing: " + inFile.getAbsolutePath());
+            ScoringTables tables = ScoringTablesBuilder.readFromXls(inFile);
+
+            // Get identifying name of this file, e.g. 'Indoor 2017'
+            String outPath = inFile.getParent();
+            String name = inFile.getName()
+                    .replace("IAAF Scoring Tables of Athletics -","")
+                    .replace(".xls","")
+                    .trim();
+
+            System.out.println("Writing point conversion tables");
+            tables.write(outPath + "/tables", name);
+
+            System.out.println("Writing formula constants");
+            tables.writeFormulaConstants(outPath + "/constants", name);
+        }
 
 //        ScoringFileConverter converter = new ScoringFileConverter();
-        ScoringTables indoor2014, outdoor2014, indoor2017, outdoor2017;
-        try {
-//            indoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2014.xls");
-//            outdoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Outdoor 2014.xls");
-//            indoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
-//            outdoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return;
-        }
+//        ScoringTables indoor2014, outdoor2014, indoor2017, outdoor2017;
+//        try {
+////            indoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2014.xls");
+////            outdoor2014 = converter.convert("IAAF Scoring Tables of Athletics - Outdoor 2014.xls");
+////            indoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+////            outdoor2017 = converter.convert("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//            return;
+//        }
 //        indoor2017.keySet().stream().sorted().forEach(System.out::println);
 //        System.out.println(outdoor2017.toString());
 

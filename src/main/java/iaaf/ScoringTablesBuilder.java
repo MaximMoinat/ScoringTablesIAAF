@@ -27,22 +27,21 @@ public class ScoringTablesBuilder {
      - * TODO:
      - *  - Format h:mm:ss.SS. .toString() and returns this as date string ('31-Dec-1899'). Damn you Excel...
      - */
-    public static ScoringTables readFromXls(String filename) throws IOException {
+    public static ScoringTables readFromXls(File inFile) throws IOException {
         // Check for extension
-        if ( ! filename.endsWith(".xls") ) {
+        if ( ! inFile.getAbsolutePath().endsWith(".xls") ) {
             throw new IOException("Only excel .xls is supported. Please convert to xls.");
         }
 
-        ScoringTablesBuilder builder = new ScoringTablesBuilder(filename);
+        ScoringTablesBuilder builder = new ScoringTablesBuilder(inFile);
         return builder.build();
     }
 
-    private ScoringTablesBuilder(String filename) throws IOException {
+    private ScoringTablesBuilder(File inFile) throws IOException {
         // Create scoring tables instance
         scoringTables = new ScoringTables();
 
         //Get the workbook instance
-        File inFile = new File("src/main/resources/" + filename);
         FileInputStream file = new FileInputStream(inFile);
         workbook = new HSSFWorkbook(file);
         file.close();
@@ -146,7 +145,7 @@ public class ScoringTablesBuilder {
     }
 
     public static void main(String[] args) throws IOException {
-        ScoringTables table = ScoringTablesBuilder.readFromXls("IAAF Scoring Tables of Athletics - Indoor 2017.xls");
+        ScoringTables table = ScoringTablesBuilder.readFromXls(new File("/src/main/resources/IAAF Scoring Tables of Athletics - Indoor 2017.xls"));
         System.out.println(table.toString());
     }
 }
