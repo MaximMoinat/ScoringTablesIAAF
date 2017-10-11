@@ -22,8 +22,8 @@ The two parameters specificy the input path and output path, respectively.
 The input is a `.xls` file containing the raw IAAF points table. This table is also given in this repository.
 
 The script will create two folders in the output directory.
- - Tables of point-performance lookups per event/gender: [`src/main/resources/scoring_tables`](/src/main/resources/tables)
- - Tables with results of the regression analysis: [`src/main/resources/formula_constants`](/src/main/resources/constants) 
+ - Tables of point-performance lookups per event/gender: [`src/main/resources/scoring_tables`](/src/main/resources/scoring_tables)
+ - Tables with results of the regression analysis: [`src/main/resources/formula_constants`](/src/main/resources/formula_constants) 
 
 ## Background and acknowledgements
 The original tables in pdf format can be found on [the IAAF website](https://www.iaaf.org/about-iaaf/documents/technical).
