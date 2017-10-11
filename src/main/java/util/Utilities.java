@@ -24,6 +24,48 @@ public class Utilities {
     }
 
     /**
+     * Three options:
+     *  - < minute: represented as numeric value (24.58)
+     *  - < hour: represented as string ('1:51.91')
+     *  - >= hour: represented as date (Sun Dec 31 01:06:25 CET 1899)
+     * @param cell
+     * @return
+     */
+    public static Double parsePerformanceFromCell(Cell cell) throws NumberFormatException {
+        if (isDateCell(cell)) {
+            return performanceDateCellToSeconds(cell);
+        }
+
+        if (isNumericCell(cell)) {
+            return cell.getNumericCellValue();
+        }
+
+        // In all other cases, treat as string
+        return performanceStringCellToSeconds(cell);
+    }
+
+    private static boolean isNumericCell(Cell cell) {
+        // Numeric cell type, but not a date (which is also of numeric type)
+        return cell.getCellType() == Cell.CELL_TYPE_NUMERIC && !isDateCell(cell);
+    }
+
+    private static boolean isDateCell(Cell cell) {
+        // Very lenient date recognition. Three 2-4 characters separated by dashes or slashes
+        return cell.toString().matches(".{2,4}[/-].{2,4}[/-].{2,4}");
+    }
+
+    private static Double performanceDateCellToSeconds(Cell cell) {
+        double days = cell.getNumericCellValue();
+        // Round to seconds. Assumption: performances above the hour are in seconds precision
+        // Note: this assumption does NOT hold for 10,000m women (<140 points)
+        return (double) Math.round(days*24*3600);
+    }
+
+    private static Double performanceStringCellToSeconds(Cell cell) throws NumberFormatException {
+        return parseTime(cell.getStringCellValue());
+    }
+
+    /**
      * Casts a performance to a double if possible
      * If time format, parses the time.
      * @param performance
@@ -31,8 +73,9 @@ public class Utilities {
      * @throws NumberFormatException
      */
     public static Double parseTime(String performance) throws NumberFormatException {
+        performance = performance.trim();
         try {
-            return Double.valueOf( performance );
+            return Double.valueOf(performance);
         } catch (NumberFormatException nfe) {
             try {
                 String[] parts = performance.split(":");

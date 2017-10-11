@@ -56,8 +56,11 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
     public void writeFormulaConstants(String outputFolder) throws IOException {
         this.writeFormulaConstants(outputFolder, "");
     }
-
     public void writeFormulaConstants(String outputFolder, String name) throws IOException {
+        writeFormulaConstants(outputFolder, name, false);
+    }
+
+    public void writeFormulaConstants(String outputFolder, String name, boolean doWriteMetaColumns) throws IOException {
         // File per gender
         for (Gender gender : this.keySet1()) {
             File outFile = new File(String.format("%s/Constants %s - %s.csv",outputFolder, name, gender));
@@ -66,25 +69,37 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
             }
 
             FileWriter fileWriter = new FileWriter(outFile);
-            fileWriter.write(String.format("%s,%s,%s,%s,%s,%s,%s%n", "event", "a", "b", "c", "a2", "b2", "c2"));
+            fileWriter.write(String.format("%s,%s,%s,%s", "event", "a", "b", "c"));
+            if (doWriteMetaColumns)
+                fileWriter.write(String.format(",%s,%s,%s,%s,%s,%s,%s%n", "a2", "b2", "c2","enum_name", "distance", "performance_type"));
+            else
+                fileWriter.write('\n');
 
             for (EventScoringTable scoreTable : this.get(gender).values()) {
                 scoreTable.doRegression();
                 Event event = scoreTable.getEvent();
                 IaafFunction function = scoreTable.getFunction();
-                fileWriter.write(String.format("%s,%.10f,%.10f,%.10f,%.10f,%.10f,%.10f,%s,%s,%s%n",
-                    event.getIaafName(),
-                    function.getIaafA(),
-                    function.getIaafB(),
-                    function.getIaafC(),
-                    function.getA(),
-                    function.getB(),
-                    function.getC(),
-                    event,
-                    event.getDistance() != null ? event.getDistance() : "",
-                    event.getPerformanceType()
 
-                ));
+                fileWriter.write(String.format("%s,%.10f,%.10f,%.10f",
+                        event.getIaafName(),
+                        function.getIaafA(),
+                        function.getIaafB(),
+                        function.getIaafC()
+                        )
+                );
+
+                if (doWriteMetaColumns)
+                    fileWriter.write(String.format(",%.10f,%.10f,%.10f,%s,%s,%s%n",
+                        function.getA(),
+                        function.getB(),
+                        function.getC(),
+                        event,
+                        event.getDistance() != null ? event.getDistance() : "",
+                        event.getPerformanceType()
+                        )
+                    );
+                else
+                    fileWriter.write('\n');
             }
             fileWriter.close();
             System.out.println("Written constants from regression analysis to: " + outFile.getAbsoluteFile());

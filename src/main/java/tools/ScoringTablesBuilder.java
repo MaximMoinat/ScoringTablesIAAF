@@ -13,7 +13,7 @@ import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 
-import static util.Utilities.parseTime;
+import static util.Utilities.parsePerformanceFromCell;
 import static util.Utilities.rowToArray;
 
 public class ScoringTablesBuilder {
@@ -102,7 +102,7 @@ public class ScoringTablesBuilder {
         List<String> columns = rowToArray(row);
 
         // Skip rows without columns (or just one column)
-        if ( columns.size() <= 1 ) {
+        if (columns.size() <= 1) {
             return;
         }
 
@@ -118,22 +118,22 @@ public class ScoringTablesBuilder {
             return;
         }
 
-        for( int i = 0; i < columns.size(); i++ ) {
-            if ( i == pointsColumnIndex ) {
+        for (int i = 0; i < columns.size(); i++) {
+            if (i == pointsColumnIndex) {
                 continue;
             }
 
             // If not numeric, continue.
-            String performanceRaw = columns.get(i).trim();
-            if (performanceRaw.equals("-") || performanceRaw.isEmpty()) {
+            String cellString = columns.get(i).trim();
+            if (cellString.equals("-") || cellString.isEmpty()) {
                 continue;
             }
 
             Double performance;
             try {
-                performance = parseTime(performanceRaw);
+                performance = parsePerformanceFromCell(row.getCell(i));
             } catch (NumberFormatException e) {
-//                e.printStackTrace();
+                e.printStackTrace();
                 continue;
             }
 
@@ -149,7 +149,7 @@ public class ScoringTablesBuilder {
     }
 
     public static void main(String[] args) throws IOException {
-        ScoringTables table = ScoringTablesBuilder.readFromXls(new File("/src/main/resources/IAAF Scoring Tables of Athletics - Indoor 2017.xls"));
-        System.out.println(table.toString());
+        ScoringTables table = ScoringTablesBuilder.readFromXls(new File("src/main/resources/IAAF Scoring Tables of Athletics - Outdoor 2017.xls"));
+        System.out.println(table.get(Gender.FEMALE,Event.TRACK_5000).toString());
     }
 }

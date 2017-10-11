@@ -17,24 +17,25 @@ public class IaafScoring {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        File path = new File(args[0]);
+        File inPath = new File(args[0]);
+        String outPath = args[1];
 
-        for (File inFile : path.listFiles((dir, name) -> name.endsWith(".xls"))) {
+        // Loop through all xls files in the given path
+        for (File inFile : inPath.listFiles((dir, name) -> name.endsWith(".xls"))) {
             System.out.println("Processing: " + inFile.getAbsolutePath());
             ScoringTables tables = ScoringTablesBuilder.readFromXls(inFile);
 
             // Get identifying name of this file, e.g. 'Indoor 2017'
-            String outPath = inFile.getParent();
-            String name = inFile.getName()
+            String outName = inFile.getName()
                     .replace("IAAF Scoring Tables of Athletics -", "")
                     .replace(".xls", "")
                     .trim();
 
             System.out.println("Writing point conversion tables");
-            tables.write(outPath + "/scoring_tables", name);
+            tables.write(outPath + "/scoring_tables", outName);
 
             System.out.println("Writing formula constants");
-            tables.writeFormulaConstants(outPath + "/formula_constants", name);
+            tables.writeFormulaConstants(outPath + "/formula_constants", outName);
         }
     }
 }
