@@ -74,28 +74,78 @@ public class Utilities {
      */
     public static Double parseTime(String performance) throws NumberFormatException {
         performance = performance.trim();
-        try {
-            return Double.valueOf(performance);
-        } catch (NumberFormatException nfe) {
+        if (performance.contains(":")) {
             try {
-                String[] parts = performance.split(":");
-                if ( parts.length == 2 ) {
-                    int minutes = Integer.parseInt( parts[0] );
-                    Double seconds = Double.parseDouble( parts[1] );
-                    return minutes*60 + seconds;
-                } else if (parts.length == 3) {
-                    int hours = Integer.parseInt( parts[0] );
-                    int minutes = Integer.parseInt( parts[1] );
-                    Double seconds = Double.parseDouble( parts[2] );
-                    return hours*3600 + minutes*60 + seconds;
-                } else {
-                    throw new NumberFormatException();
-                }
+                return parseTimeSemicolon(performance);
             } catch (Exception e) {
-//                System.out.println( e.getMessage() );
-//                e.printStackTrace();
                 throw new NumberFormatException( String.format("Can't process '%s'", performance) );
             }
+        } else if (performance.matches(".*\\.\\d\\d\\..*")) {
+            try {
+                return parseTimeDot(performance);
+            } catch (Exception e) {
+                throw new NumberFormatException( String.format("Can't process '%s'", performance) );
+            }
+        } else {
+            throw new NumberFormatException( String.format("Can't process '%s' as it is not a recognised format", performance) );
         }
+    }
+
+    /**
+     * Parses time in the format hh:mm:ss.tt
+     * @param performance
+     * @return
+     * @throws NumberFormatException
+     */
+    public static Double parseTimeSemicolon(String performance) throws NumberFormatException {
+        String[] parts = performance.split(":");
+        int hours, minutes, seconds;
+        switch(parts.length) {
+            case 1:
+                return Double.valueOf(performance);
+            case 2:
+                int minutes = Integer.parseInt( parts[0] );
+                Double seconds = Double.parseDouble( parts[1] );
+                break;
+            case 3:
+                int hours = Integer.parseInt( parts[0] );
+                int minutes = Integer.parseInt( parts[1] );
+                Double seconds = Double.parseDouble( parts[2] );
+                break;
+            default:
+                throw new NumberFormatException("Unexpected number of parts.");
+        }
+        return hours*3600 + minutes*60 + seconds;
+    }
+
+    /**
+     * Parses time in the format [m]m.ss.t
+     * @param performance
+     * @return
+     * @throws NumberFormatException
+     */
+    public static Double parseTimeDot(String performance) throws NumberFormatException {
+        String[] parts = performance.split(".");
+        int hours, minutes, seconds, tenths;
+        switch(parts.length) {
+            case 2:
+                int seconds = Integer.parseInt( parts[0] );
+                int tenths = Integer.parseInt( parts[1] );
+                break;
+            case 3:
+                int minutes = Integer.parseInt( parts[0] );
+                int seconds = Integer.parseInt( parts[1] );
+                int tenths = Integer.parseInt( parts[2] );
+                break;
+            case 4:
+                int hours = Integer.parseInt( parts[0] );
+                int minutes = Integer.parseInt( parts[1] );
+                int seconds = Integer.parseInt( parts[2] );
+                int tenths = Integer.parseInt( parts[3] );
+                break;
+            default:
+                throw new NumberFormatException("Unexpected number of parts.");
+        }
+        return hours*3600 + minutes*60 + seconds + tenths/10d;
     }
 }
