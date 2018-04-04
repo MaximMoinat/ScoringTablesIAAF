@@ -30,9 +30,6 @@ public class IaafScoring {
                     .replace("IAAF Scoring Tables of Athletics -", "")
                     .replace(".xls", "")
                     .trim();
-//            if (outName.contains("2017")) {
-//                continue;
-//            }
 
             System.out.println("Writing point conversion tables");
             tables.write(outPath + "/output/scoring_tables", outName);

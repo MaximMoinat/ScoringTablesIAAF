@@ -126,23 +126,17 @@ public class ScoringTablesBuilder {
             }
 
             // If not numeric, continue.
-            String cellString = columns.get(i).trim();
-            if (cellString.equals("-") || cellString.isEmpty()) {
+            String cellString = columns.get(i);
+            if (cellString == null || cellString.equals("-") || cellString.isEmpty()) {
                 continue;
             }
 
             Double performance;
-            Cell cell = row.getCell(i);
-            if (cell == null) {
-                // TODO: sometimes cellString is valid, while cell is empty... Mismatch between column indices?
-                performance = parseTime(cellString);
-            } else {
-                try {
-                    performance = parsePerformanceFromCell(row.getCell(i));
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                    continue;
-                }
+            try {
+                performance = parsePerformanceFromCell(row.getCell(i));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                continue;
             }
 
             // Add to table

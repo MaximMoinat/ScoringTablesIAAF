@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,12 +16,17 @@ public class Utilities {
      * @return
      */
     public static List<String> rowToArray(Row row) {
-        Iterator<Cell> cellIterator = row.cellIterator();
-        List<String> result = new ArrayList<>();
-        while ( cellIterator.hasNext() ) {
-            result.add( cellIterator.next().toString().trim() );
+        int cellCount = row.getLastCellNum();
+        String[] result = new String[cellCount];
+
+        for (int i = 0; i < cellCount; i++) {
+            Cell cell = row.getCell(i);
+            if (cell != null) {
+                result[i] = cell.toString().trim();
+            }
         }
-        return result;
+
+        return Arrays.asList(result);
     }
 
     /**
