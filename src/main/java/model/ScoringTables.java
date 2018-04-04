@@ -69,9 +69,9 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
             }
 
             FileWriter fileWriter = new FileWriter(outFile);
-            fileWriter.write(String.format("%s,%s,%s,%s", "event", "a", "b", "c"));
+            fileWriter.write(String.format("%s,%s,%s,%s,%s", "event", "formula", "a", "b", "c"));
             if (doWriteMetaColumns)
-                fileWriter.write(String.format(",%s,%s,%s,%s,%s,%s,%s%n", "a2", "b2", "c2","enum_name", "distance", "performance_type"));
+                fileWriter.write(String.format(",%s,%s,%s,%s,%s,%s%n", "a2", "b2", "c2","enum_name", "distance", "performance_type"));
             else
                 fileWriter.write('\n');
 
@@ -80,8 +80,9 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
                 Event event = scoreTable.getEvent();
                 IaafFunction function = scoreTable.getFunction();
 
-                fileWriter.write(String.format("%s,%.10f,%.10f,%.10f",
-                        event.getIaafName(),
+                fileWriter.write(String.format("%s,%s,%.10f,%.10f,%.10f",
+                        event,
+                        "IAAF_hungarian",
                         function.getIaafA(),
                         function.getIaafB(),
                         function.getIaafC()

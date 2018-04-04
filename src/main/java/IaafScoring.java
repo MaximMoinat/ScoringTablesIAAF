@@ -30,12 +30,15 @@ public class IaafScoring {
                     .replace("IAAF Scoring Tables of Athletics -", "")
                     .replace(".xls", "")
                     .trim();
+//            if (outName.contains("2017")) {
+//                continue;
+//            }
 
             System.out.println("Writing point conversion tables");
-            tables.write(outPath + "/scoring_tables", outName);
+            tables.write(outPath + "/output/scoring_tables", outName);
 
             System.out.println("Writing formula constants");
-            tables.writeFormulaConstants(outPath + "/formula_constants", outName);
+            tables.writeFormulaConstants(outPath + "/output", outName, false);
         }
     }
 }
