@@ -12,10 +12,15 @@ public class UtilitiesTest {
 
     @Test
     public void testParseTime() {
+        // Modern format
         assertEquals(111.91d, Utilities.parseTime("1:51.91"), 0.001);
         assertEquals(3599.99d, Utilities.parseTime("59:59.99"), 0.001);
         assertEquals(7199.99d, Utilities.parseTime("1:59:59.99"), 0.001);
-        assertEquals(12.34d, Utilities.parseTime("12.34"), 0.001);
+
+        // Old format (1965 tables)
+        assertEquals(111.9d, Utilities.parseTime("1.51.9"), 0.001);
+        assertEquals(754.5d, Utilities.parseTime("12.34.5"), 0.001);
+        assertEquals(2857.8d, Utilities.parseTime("47.37.8"), 0.001);
     }
 
     @Test

@@ -32,6 +32,10 @@ public class Utilities {
      * @return
      */
     public static Double parsePerformanceFromCell(Cell cell) throws NumberFormatException {
+        if (cell == null) {
+            throw new NumberFormatException("Cell is empty.");
+        }
+
         if (isDateCell(cell)) {
             return performanceDateCellToSeconds(cell);
         }
@@ -51,6 +55,10 @@ public class Utilities {
 
     private static boolean isDateCell(Cell cell) {
         // Very lenient date recognition. Three 2-4 characters separated by dashes or slashes
+        if (cell == null || cell.toString() == null) {
+            System.out.println(cell);
+            return false;
+        }
         return cell.toString().matches(".{2,4}[/-].{2,4}[/-].{2,4}");
     }
 
@@ -74,6 +82,7 @@ public class Utilities {
      */
     public static Double parseTime(String performance) throws NumberFormatException {
         performance = performance.trim();
+        performance = performance.replace(';','.'); // Fix OCR errors
         if (performance.contains(":")) {
             try {
                 return parseTimeSemicolon(performance);
@@ -84,6 +93,7 @@ public class Utilities {
             try {
                 return parseTimeDot(performance);
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 throw new NumberFormatException( String.format("Can't process '%s'", performance) );
             }
         } else {
@@ -99,18 +109,19 @@ public class Utilities {
      */
     public static Double parseTimeSemicolon(String performance) throws NumberFormatException {
         String[] parts = performance.split(":");
-        int hours, minutes, seconds;
+        int hours = 0, minutes = 0;
+        Double seconds;
         switch(parts.length) {
             case 1:
                 return Double.valueOf(performance);
             case 2:
-                int minutes = Integer.parseInt( parts[0] );
-                Double seconds = Double.parseDouble( parts[1] );
+                minutes = Integer.parseInt( parts[0] );
+                seconds = Double.parseDouble( parts[1] );
                 break;
             case 3:
-                int hours = Integer.parseInt( parts[0] );
-                int minutes = Integer.parseInt( parts[1] );
-                Double seconds = Double.parseDouble( parts[2] );
+                hours = Integer.parseInt( parts[0] );
+                minutes = Integer.parseInt( parts[1] );
+                seconds = Double.parseDouble( parts[2] );
                 break;
             default:
                 throw new NumberFormatException("Unexpected number of parts.");
@@ -125,23 +136,23 @@ public class Utilities {
      * @throws NumberFormatException
      */
     public static Double parseTimeDot(String performance) throws NumberFormatException {
-        String[] parts = performance.split(".");
-        int hours, minutes, seconds, tenths;
+        String[] parts = performance.split("\\.");
+        int hours = 0, minutes = 0, seconds, tenths;
         switch(parts.length) {
             case 2:
-                int seconds = Integer.parseInt( parts[0] );
-                int tenths = Integer.parseInt( parts[1] );
+                seconds = Integer.parseInt( parts[0] );
+                tenths = Integer.parseInt( parts[1] );
                 break;
             case 3:
-                int minutes = Integer.parseInt( parts[0] );
-                int seconds = Integer.parseInt( parts[1] );
-                int tenths = Integer.parseInt( parts[2] );
+                minutes = Integer.parseInt( parts[0] );
+                seconds = Integer.parseInt( parts[1] );
+                tenths = Integer.parseInt( parts[2] );
                 break;
             case 4:
-                int hours = Integer.parseInt( parts[0] );
-                int minutes = Integer.parseInt( parts[1] );
-                int seconds = Integer.parseInt( parts[2] );
-                int tenths = Integer.parseInt( parts[3] );
+                hours = Integer.parseInt( parts[0] );
+                minutes = Integer.parseInt( parts[1] );
+                seconds = Integer.parseInt( parts[2] );
+                tenths = Integer.parseInt( parts[3] );
                 break;
             default:
                 throw new NumberFormatException("Unexpected number of parts.");

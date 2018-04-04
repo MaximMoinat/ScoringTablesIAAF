@@ -6,6 +6,7 @@ import model.Event;
 import model.Gender;
 import model.ScoringTables;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static util.Utilities.parsePerformanceFromCell;
+import static util.Utilities.parseTime;
 import static util.Utilities.rowToArray;
 
 public class ScoringTablesBuilder {
@@ -130,11 +132,17 @@ public class ScoringTablesBuilder {
             }
 
             Double performance;
-            try {
-                performance = parsePerformanceFromCell(row.getCell(i));
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                continue;
+            Cell cell = row.getCell(i);
+            if (cell == null) {
+                // TODO: sometimes cellString is valid, while cell is empty... Mismatch between column indices?
+                performance = parseTime(cellString);
+            } else {
+                try {
+                    performance = parsePerformanceFromCell(row.getCell(i));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                    continue;
+                }
             }
 
             // Add to table
