@@ -17,6 +17,7 @@ public class IaafFunction {
     private double a;
     private double b;
     private double c;
+    private double r2;
 
     public IaafFunction(double a, double b, double c) {
         this.a = a;
@@ -48,6 +49,14 @@ public class IaafFunction {
     public double getIaafC() {
         // c = c - b^2/4a
         return c - Math.pow(b,2)/(4 * a);
+    }
+
+    public void setR2(double r2) {
+        this.r2 = r2;
+    }
+
+    public double getR2() {
+        return r2;
     }
 
     public double calculatePoints(double performance) {

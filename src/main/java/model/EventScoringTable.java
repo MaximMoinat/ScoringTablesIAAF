@@ -49,7 +49,6 @@ public class EventScoringTable {
      * If performance not in table, get closest worse performance that is in the table.
      * @param performance
      * @return number of points or null if not found
-     * // TODO: tests
      */
     public Integer lookupPoints(double performance) {
         performance = Math.round(performance * 100d)/100d;
@@ -87,7 +86,6 @@ public class EventScoringTable {
      * If points not in table, get closest worse performance
      * @param points
      * @return performance or null if no match
-     * // TODO: tests
      */
     public Double lookupPerformance(int points) {
         if (points < Collections.min(performancePoints.values())
@@ -128,6 +126,15 @@ public class EventScoringTable {
                 .toArray();
     }
 
+    public double[] getInverseScoresAsDouble() {
+        return performancePoints
+                .keySet()
+                .stream()
+                .mapToDouble(Double::doubleValue)
+                .map(score -> 1/score)
+                .toArray();
+    }
+
     public Map<Double, Integer> getPerformancePoints() {
         return performancePoints;
     }
@@ -150,8 +157,13 @@ public class EventScoringTable {
 
     public void doRegression() {
 //        System.out.println("Starting Polynomial Regression for: " + gender + event);
-        PolynomialRegression regression = new PolynomialRegression(this.getScoresAsDouble(), this.getPointsAsDouble(), 2);
-        this.scoringFunction = new IaafFunction(regression.beta(2),regression.beta(1),regression.beta(0));
+        // TODO: proper switch between models (inverse relation vs quadratic)
+        double[] scores = this.getInverseScoresAsDouble(); // this.getScoresAsDouble()
+        double[] points = this.getPointsAsDouble();
+        int degree = 1; //2
+        PolynomialRegression regression = new PolynomialRegression(scores, points, degree);
+        scoringFunction = new IaafFunction(regression.beta(2),regression.beta(1),regression.beta(0));
+        scoringFunction.setR2(regression.R2());
     }
 
     public int calculatePoints(double performance) {

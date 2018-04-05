@@ -29,10 +29,8 @@ public class ScoringTablesBuilder {
     private Gender currentGender;
 
     /**
-     - * Load a ScoringTables object
-     - * TODO:
-     - *  - Format h:mm:ss.SS. .toString() and returns this as date string ('31-Dec-1899'). Damn you Excel...
-     - */
+     * Load a ScoringTables object
+     */
     public static ScoringTables readFromXls(File inFile) throws IOException {
         // Check for extension
         if ( ! inFile.getAbsolutePath().endsWith(".xls") ) {
@@ -51,8 +49,6 @@ public class ScoringTablesBuilder {
         FileInputStream file = new FileInputStream(inFile);
         workbook = new HSSFWorkbook(file);
         file.close();
-
-        System.out.println("Opened file: " + inFile.getAbsoluteFile());
     }
 
     private ScoringTables build() {

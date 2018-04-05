@@ -132,6 +132,7 @@ public class PolynomialRegression {
         // to make -0.0 print as 0.0
         // MM: do not ignore small beta values
 //        if (Math.abs(beta.get(j, 0)) < 1E-4) return 0.0;
+        if (j > degree) return 0d;
         return beta.get(j, 0);
     }
 
@@ -225,10 +226,17 @@ public class PolynomialRegression {
      * @param args the command-line arguments
      */
     public static void main(String[] args) {
+        // Quadratic
         double[] x = { 10, 20, 40, 80, 160, 200 };
         double[] y = { 100, 400, 1600, 6400, 25600, 40000 };
 
         PolynomialRegression regression = new PolynomialRegression(x, y, 2);
         System.out.println(regression);
+
+        // Linear
+        double[] x2 = {0.01015228,0.01014199,0.01013171,0.01012146,0.01011122,0.01010101,0.01009082,0.01008065,0.01007049,0.01006036};
+        double[] y2 = {1200,1197,1195,1192,1190,1187,1185,1182,1180,1177};
+        PolynomialRegression regression2 = new PolynomialRegression(x2, y2, 1);
+        System.out.println(regression2.beta(1));
     }
 }

@@ -6,6 +6,7 @@ import util.NestedHashMap;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Created on 12-11-16.
@@ -42,7 +43,8 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
                 fileWriter.write(String.format("%s,%s%n", "performance", "points"));
 
                 for (Entry<Double, Integer> score : scoreTable.getPerformancePoints().entrySet()) {
-                    fileWriter.write(String.format("%.2f,%d%n",
+                    fileWriter.write(String.format(Locale.ENGLISH,
+                            "%.2f,%d%n",
                             score.getKey(),
                             score.getValue()
                     ));
@@ -51,6 +53,40 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
             }
         }
         System.out.println("Written conversion tables to: " + outputFolder);
+    }
+
+    public void writeCombined(String outputFolder, String name) throws IOException {
+        for (Gender gender : this.keySet1()) {
+            File outFile = new File(String.format("%s/Table %s - %s.csv",
+                    outputFolder,
+                    name,
+                    gender
+            ));
+            if (outFile.getParentFile().mkdirs()) {
+                System.out.println("Created directory: " + outFile.getParent());
+            }
+
+            FileWriter fileWriter = new FileWriter(outFile);
+            fileWriter.write("points");
+
+            for (EventScoringTable scoreTable : this.get(gender).values()) {
+                fileWriter.write(String.format(",%s", scoreTable.getEvent()));
+            }
+            fileWriter.write('\n');
+
+            for (int i = 1; i <= 1200; i++) {
+                fileWriter.write(String.format(Locale.ENGLISH, "%d", i));
+                for (EventScoringTable scoreTable : this.get(gender).values()) {
+                    fileWriter.write(String.format(Locale.ENGLISH,
+                            ",%.2f",
+                            scoreTable.lookupPerformance(i))
+                    );
+                }
+                fileWriter.write('\n');
+            }
+            fileWriter.close();
+        }
+        System.out.println("Written overview table.");
     }
 
     public void writeFormulaConstants(String outputFolder) throws IOException {
@@ -80,7 +116,8 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
                 Event event = scoreTable.getEvent();
                 IaafFunction function = scoreTable.getFunction();
 
-                fileWriter.write(String.format("%s,%s,%.10f,%.10f,%.10f",
+                fileWriter.write(String.format(Locale.ENGLISH,
+                        "%s,%s,%.10f,%.10f,%.10f",
                         event,
                         "IAAF_hungarian",
                         function.getIaafA(),
@@ -90,15 +127,16 @@ public class ScoringTables extends NestedHashMap<Gender,Event,EventScoringTable>
                 );
 
                 if (doWriteMetaColumns)
-                    fileWriter.write(String.format(",%.10f,%.10f,%.10f,%s,%s,%s%n",
+                    fileWriter.write(String.format(Locale.ENGLISH,
+                        ",%.10f,%.10f,%.10f,%s,%s,%s,%.10f,%n",
                         function.getA(),
                         function.getB(),
                         function.getC(),
                         event,
                         event.getDistance() != null ? event.getDistance() : "",
-                        event.getPerformanceType()
-                        )
-                    );
+                        event.getPerformanceType(),
+                        function.getR2()
+                    ));
                 else
                     fileWriter.write('\n');
             }
