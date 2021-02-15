@@ -4,13 +4,13 @@ This is a hobby project I started on at the end of 2016 and updated mid 2017 to 
  - Properly handling Java file input/output
  - Usage of the Apache POI package
  - Getting the most from Java Enums
- - Bit of regression analysis statistics
+ - Regression analysis
  - Basic usage of Maven to manage dependencies
  - Pdf as data input is terrible, but [Smallpdf](http://www.smallpdf.com) makes this easy.
 
-## What does this package and how to use it?
+## What does this package do and how to use it?
 Reads the IAAF scoring tables from excel files and writes the scoring tables per event in a machine readable format.
-In addition, a second order polynomial regression is performed to calculate the constants of the underlying formula.
+In addition, **a second order polynomial regression** is performed to calculate the constants of the underlying formula.
 These constants are also written to a file. Output for the 2017 tables, both indoor and outdoor, is included.
 
 After building, the script can be executed with the following code. 
@@ -22,8 +22,8 @@ The two parameters specificy the input path and output path, respectively.
 The input is a `.xls` file containing the raw IAAF points table. This table is also given in this repository.
 
 The script will create two folders in the output directory.
- - Tables of point-performance lookups per event/gender: [`src/main/resources/scoring_tables`](/src/main/resources/scoring_tables)
- - Tables with results of the regression analysis: [`src/main/resources/formula_constants`](/src/main/resources/formula_constants) 
+ - Processed tables of **point-performance lookups** per event and gender: [`src/main/resources/output/scoring_tables`](/src/main/resources/output/scoring_tables)
+ - Tables with results of the **regression analysis**: [`src/main/resources/output`](/src/main/resources/output) 
 
 ## Background and acknowledgements
 The original tables in pdf format can be found on [the IAAF website](https://www.iaaf.org/about-iaaf/documents/technical).
